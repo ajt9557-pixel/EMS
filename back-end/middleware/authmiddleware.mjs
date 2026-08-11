@@ -1,8 +1,10 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.mjs";
+import connectDB from "../db/db.mjs";
 
 const verifyuser = async (req, res, next) => {
     try {
+        await connectDB();
         const authHeader = req.headers.authorization;
         if (!authHeader) {
             return res.status(404).json({success: false, error: "no token found"});

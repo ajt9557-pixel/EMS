@@ -2,7 +2,7 @@ import User from './models/User.mjs';
 import bcrypt from 'bcryptjs';
 import connectDB from './db/db.mjs';
 const userRegister = async () => { 
-    connectDB();
+    await connectDB();
  
     try{
         const hashPassword = await bcrypt.hash("Admin123", 10);

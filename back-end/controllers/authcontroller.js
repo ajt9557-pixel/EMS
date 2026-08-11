@@ -2,10 +2,12 @@ import { json } from 'express';
 import User from '../models/User.mjs';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import connectDB from '../db/db.mjs';
 
 const login = async (req, res) => {
     console.log('LOGIN REQUEST RECEIVED', req.body);
     try {
+        await connectDB();
         const {email, password} = req.body;
         console.log('Looking up user...');
         const user = await User.findOne({email});

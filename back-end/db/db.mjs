@@ -1,12 +1,17 @@
 import mongoose from "mongoose";
 
-const connecttoDatabase = async () => {
-    try{
-        await mongoose.connect(process.env.MONGODB_URL);
-       
+let connectionPromise = null;
+
+const connectDB = async () => {
+    if (mongoose.connection.readyState === 1) {
+        return mongoose.connection;
     }
-    catch(error){
-        console.log(error);
+    if (!connectionPromise) {
+        connectionPromise = mongoose.connect(process.env.MONGODB_URL, {
+            serverSelectionTimeoutMS: 15000,
+        });
     }
-}
-export default connecttoDatabase;
+    return connectionPromise;
+};
+
+export default connectDB;
