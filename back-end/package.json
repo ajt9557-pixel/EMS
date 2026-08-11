@@ -5,7 +5,8 @@
   "main": "index.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon  --env-file=.env index.mjs"
+    "start": "node index.mjs",
+    "dev": "nodemon --env-file=.env index.mjs"
   },
   "keywords": [],
   "type": "module",
