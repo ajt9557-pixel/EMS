@@ -1,5 +1,5 @@
 import User from './models/User.mjs';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import connectDB from './db/db.mjs';
 const userRegister = async () => { 
     connectDB();
