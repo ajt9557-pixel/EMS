@@ -10,6 +10,9 @@ const connectDB = async () => {
         connectionPromise = mongoose.connect(process.env.MONGODB_URL, {
             serverSelectionTimeoutMS: 15000,
         });
+        connectionPromise.catch(() => {
+            connectionPromise = null;
+        });
     }
     return connectionPromise;
 };

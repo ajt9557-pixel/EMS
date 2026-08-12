@@ -6,7 +6,7 @@ import cors from 'cors';
 import authRoutes from './routes/auth.js';
 import connectDB from './db/db.mjs';
 
-connectDB();
+connectDB().catch((err) => console.log('DB CONNECT ERROR:', err.message));
 const app = express();
 app.use(cors());
 app.use(express.json());
