@@ -204,7 +204,7 @@ const Login = () => {
               <div className="w-full border-t border-blue-100" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white/80 px-3 text-blue-300">Secured connection</span>
+              <span className="bg-white/80 px-3 text-blue-300">POGI NA GAWA NI ALEXIS</span>
             </div>
           </div>
         </div>

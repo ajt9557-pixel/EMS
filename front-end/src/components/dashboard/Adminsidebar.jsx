@@ -59,27 +59,27 @@ const AdminSidebar = () => {
 
 
       <nav className="flex flex-col gap-1 p-4 flex-1">
-        <NavLink to="/admin-dashboard" className={linkClasses} >
+        <NavLink to="/admin-dashboard" end className={linkClasses} >
           <DashboardIcon />
           Dashboard
         </NavLink>
-        <NavLink to="/admin-dashboard/employee-dashboard" className={linkClasses}>
+        <NavLink to="/admin-dashboard/employee-dashboard" end className={linkClasses}>
           <EmployeesIcon />
           Employees
         </NavLink>
-        <NavLink to="/admin-dashboard/Department-dashboard" className={linkClasses}>
+        <NavLink to="/admin-dashboard/Department-dashboard" end className={linkClasses}>
           <DepartmentsIcon />
           Departments
         </NavLink>
-        <NavLink to="/admin-dashboard/Leave-dashboard" className={linkClasses}>
+        <NavLink to="/admin-dashboard/Leave-dashboard" end className={linkClasses}>
           <LeavesIcon />
           Leaves
         </NavLink>
-        <NavLink to="/admin-dashboard/salary-dashboard" className={linkClasses}>
+        <NavLink to="/admin-dashboard/salary-dashboard" end className={linkClasses}>
           <SalaryIcon />
           Salary
         </NavLink>
-        <NavLink to="/admin-dashboard/Settings-dashboard" className={linkClasses}>
+        <NavLink to="/Settings-dashboard" end className={linkClasses}>
           <SettingsIcon />
           Settings
         </NavLink>
