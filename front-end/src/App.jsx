@@ -16,8 +16,9 @@ function App() {
             <AdminDashboard />
             </RoleBaseRoutes>
             </PrivateRoutes>
-        } />
-      <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
+        }/>
+
+        <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
     </Routes>
   )
 }
