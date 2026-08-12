@@ -2,8 +2,8 @@ import React from 'react'
 import { useAuth } from '../context/authcontext'
 import Adminsidebar from '../components/dashboard/Adminsidebar.jsx'
 import Navbar from '../components/dashboard/Navbar.jsx'
-import AdminSummary from "../components/dashboard/AdminSummary";
 import DashboardLayout from '../components/DashboardLayout'
+import { Outlet } from "react-router-dom";
 
 const AdminDashboard = () => {
   useAuth()
@@ -11,7 +11,7 @@ const AdminDashboard = () => {
     <DashboardLayout sidebar={<Adminsidebar />}>
       <Navbar />
       <div className="p-6">
-        <AdminSummary />
+        <Outlet />
       </div>
     </DashboardLayout>
   )

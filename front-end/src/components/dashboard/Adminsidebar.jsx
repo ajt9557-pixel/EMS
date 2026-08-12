@@ -63,23 +63,23 @@ const AdminSidebar = () => {
           <DashboardIcon />
           Dashboard
         </NavLink>
-        <NavLink to="/employee-dashboard" className={linkClasses}>
+        <NavLink to="/admin-dashboard/employee-dashboard" className={linkClasses}>
           <EmployeesIcon />
           Employees
         </NavLink>
-        <NavLink to="/Department-dashboard" className={linkClasses}>
+        <NavLink to="/admin-dashboard/Department-dashboard" className={linkClasses}>
           <DepartmentsIcon />
           Departments
         </NavLink>
-        <NavLink to="/Leave-dashboard" className={linkClasses}>
+        <NavLink to="/admin-dashboard/Leave-dashboard" className={linkClasses}>
           <LeavesIcon />
           Leaves
         </NavLink>
-        <NavLink to="/salary-dashboard" className={linkClasses}>
+        <NavLink to="/admin-dashboard/salary-dashboard" className={linkClasses}>
           <SalaryIcon />
           Salary
         </NavLink>
-        <NavLink to="/Settings-dashboard" className={linkClasses}>
+        <NavLink to="/admin-dashboard/Settings-dashboard" className={linkClasses}>
           <SettingsIcon />
           Settings
         </NavLink>
