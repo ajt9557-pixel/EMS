@@ -1,0 +1,215 @@
+====================================================================
+ AICS EMPLOYEE MANAGEMENT SYSTEM - COMPLETE PSEUDO CODE
+====================================================================
+
+1. AUTHENTICATION MODULE
+====================================================================
+FUNCTION LOGIN(email, password, rememberMe):
+    IF email == "" OR password == "":
+        SHOW ERROR "Please fill in all fields"
+        RETURN
+
+    SET loading = true
+    SHOW LoadingOverlay(logo, spinner)
+
+    response = POST /api/auth/login { email, password }
+
+    IF response.success == true:
+        token = response.token
+        user  = response.user
+
+        IF rememberMe == true:
+            SAVE token to localStorage
+        ELSE:
+            SAVE token to sessionStorage
+
+        SAVE user to AuthContext (global state)
+
+        IF user.role == "admin":
+            NAVIGATE to /admin-dashboard
+        ELSE:
+            NAVIGATE to /employee-dashboard
+
+    ELSE:
+        SHOW ERROR response.error
+
+    SET loading = false
+    HIDE LoadingOverlay
+
+FUNCTION REGISTER(name, email, password):
+    VALIDATE all fields are filled
+    response = POST /api/auth/register { name, email, password }
+    IF response.success: NAVIGATE to /login
+
+FUNCTION LOGOUT():
+    DELETE token from localStorage AND sessionStorage
+    CLEAR user from AuthContext
+    NAVIGATE to /login
+
+FUNCTION VERIFY_SESSION():
+    token = GET from localStorage OR sessionStorage
+    IF token exists:
+        response = GET /api/auth/verify (with Bearer token)
+        IF response.success: SET user in AuthContext
+        ELSE: LOGOUT()
+
+====================================================================
+2. ROUTING / ACCESS CONTROL
+====================================================================
+ROUTES:
+    "/"                        -> redirect to /login
+    "/login"                   -> Login page (public)
+    "/register"                -> Register page (public)
+    "/admin-dashboard/*"       -> Protected (admin only)
+    "/employee-dashboard/*"    -> Protected (employee only)
+
+MIDDLEWARE PRIVATE_ROUTE(component):
+    IF no token: NAVIGATE to /login
+    ELSE: RENDER component
+
+MIDDLEWARE ROLE_BASE_ROUTE(component, requiredRoles):
+    IF user.role NOT IN requiredRoles:
+        SHOW "Access Denied" page
+    ELSE:
+        RENDER component
+
+====================================================================
+3. DASHBOARD LAYOUT (shared)
+====================================================================
+LAYOUT dashboardLayout(sidebar, content):
+    RENDER sidebar (fixed, left side)
+    RENDER navbar (welcome message + logout button)
+    RENDER content area (current page via Outlet)
+
+SIDEBAR menu (admin):
+    - Dashboard            -> /admin-dashboard
+    - Employees            -> /admin-dashboard/employee-dashboard
+    - Departments          -> /admin-dashboard/department-dashboard
+    - Leaves               -> /admin-dashboard/leave-dashboard
+    - Salary               -> /admin-dashboard/salary-dashboard
+    - Settings             -> /settings
+
+====================================================================
+4. ADMIN SUMMARY / DASHBOARD MODULE
+====================================================================
+FUNCTION LOAD_DASHBOARD():
+    totalEmployees   = GET /api/stats/total-employees
+    totalDepartments = GET /api/stats/total-departments
+    monthlySalary    = GET /api/stats/monthly-salary
+    leaveStats       = GET /api/stats/leaves
+
+    DISPLAY SummaryCards:
+        [Total Employees]   [Total Departments]   [Monthly Salary]
+        [Leave Applied]     [Leave Approved]      [Leave Pending]  [Leave Rejected]
+
+====================================================================
+5. EMPLOYEE MODULE (CRUD)
+====================================================================
+FUNCTION VIEW_EMPLOYEES(searchKeyword):
+    IF searchKeyword != "":
+        employees = GET /api/employees?search=searchKeyword
+    ELSE:
+        employees = GET /api/employees
+
+    DISPLAY table/cards:
+        - Profile picture, Name, Email, Department, Role, Status, Actions
+        - Search bar (filters as you type)
+        - Button "Add New Employee"
+
+FUNCTION ADD_EMPLOYEE(data):
+    VALIDATE required fields (name, email, department, role)
+    response = POST /api/employees { data }
+    IF success: REFRESH list, SHOW "Employee added"
+    ELSE: SHOW error
+
+FUNCTION EDIT_EMPLOYEE(id, updatedData):
+    response = PUT /api/employees/id { updatedData }
+    IF success: REFRESH list, SHOW "Employee updated"
+
+FUNCTION DELETE_EMPLOYEE(id):
+    CONFIRM "Are you sure?"
+    response = DELETE /api/employees/id
+    IF success: REMOVE from list, SHOW "Employee deleted"
+
+====================================================================
+6. DEPARTMENT MODULE (CRUD)
+====================================================================
+FUNCTION VIEW_DEPARTMENTS(searchKeyword):
+    departments = GET /api/departments
+    FILTER by searchKeyword (name match)
+    DISPLAY department cards:
+        - Department name, Head, Employee count, Status
+        - Button "Add New Department"
+
+FUNCTION ADD_DEPARTMENT(data):
+    VALIDATE (name, description required)
+    response = POST /api/departments { data }
+    IF success: NAVIGATE back to department list
+    ELSE: SHOW error
+
+FUNCTION EDIT_DEPARTMENT(id, data):
+    response = PUT /api/departments/id { data }
+    IF success: REFRESH list
+
+FUNCTION DELETE_DEPARTMENT(id):
+    CONFIRM action
+    response = DELETE /api/departments/id
+    IF success: REFRESH list
+
+====================================================================
+7. LEAVE MODULE
+====================================================================
+EMPLOYEE:
+    FUNCTION APPLY_LEAVE(leaveData):
+        VALIDATE (dates, type, reason)
+        response = POST /api/leaves { leaveData, status: "pending" }
+        IF success: SHOW "Leave request submitted"
+
+    FUNCTION VIEW_MY_LEAVES():
+        leaves = GET /api/leaves/my
+        DISPLAY list with status (pending/approved/rejected)
+
+ADMIN:
+    FUNCTION VIEW_ALL_LEAVES():
+        leaves = GET /api/leaves
+        DISPLAY pending requests with [Approve] [Reject] buttons
+
+    FUNCTION APPROVE_LEAVE(leaveId):
+        response = PUT /api/leaves/leaveId/approve
+        IF success: UPDATE status to "approved"
+
+    FUNCTION REJECT_LEAVE(leaveId, reason):
+        response = PUT /api/leaves/leaveId/reject { reason }
+        IF success: UPDATE status to "rejected"
+
+====================================================================
+8. SALARY MODULE
+====================================================================
+FUNCTION VIEW_SALARY():
+    salaryRecords = GET /api/salary
+
+    ADMIN:  View all employees' salaries, total monthly payroll
+    EMPLOYEE: View own salary, deductions, net pay
+
+    DISPLAY: Gross pay, Deductions, Net pay, Pay date
+    PRINT payslip option
+
+====================================================================
+9. SETTINGS MODULE
+====================================================================
+FUNCTION UPDATE_PROFILE(data):
+    response = PUT /api/users/me { data }
+    IF success: UPDATE AuthContext user
+
+FUNCTION CHANGE_PASSWORD(oldPassword, newPassword):
+    VALIDATE new password length >= 8
+    response = PUT /api/users/me/password { old, new }
+    IF success: SHOW "Password changed"
+
+====================================================================
+10. COMMON UI PATTERNS
+====================================================================
+LOADING: Show overlay with logo + spinner on every async request
+ERROR:   Show red alert box with message from server
+SUCCESS: Show green toast/notification
+EMPTY:   Show "No records found" placeholder

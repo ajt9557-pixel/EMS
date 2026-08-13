@@ -5,12 +5,14 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import authRoutes from './routes/auth.js';
 import connectDB from './db/db.mjs';
+import departmentRouter from './routes/department.js';
 
 connectDB().catch((err) => console.log('DB CONNECT ERROR:', err.message));
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
+app.use('/api/department', departmentRouter);
 
 export default app;
 

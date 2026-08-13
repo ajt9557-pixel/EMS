@@ -18,10 +18,13 @@ const Login = () => {
     setError(null)
     setLoading(true)
     try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
-        email,
-        password,
-      })
+      const [response] = await Promise.all([
+        axios.post(`${API_URL}/api/auth/login`, {
+          email,
+          password,
+        }),
+        new Promise((resolve) => setTimeout(resolve, 1500)),
+      ])
 
       if (response.data.success) {
         login(response.data.user)
@@ -51,6 +54,22 @@ const Login = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4"
       style={{ background: 'linear-gradient(160deg, #EBF4FF 0%, #DBEAFE 30%, #EFF6FF 60%, #F0F9FF 100%)' }}>
+
+
+      {loading && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-white/90 backdrop-blur-sm">
+          <div className="w-24 h-24 rounded-3xl bg-white shadow-lg shadow-blue-100 ring-1 ring-blue-50 flex items-center justify-center animate-bounce">
+            <img src="/pics/aics.jpg" alt="Company Logo" className="w-16 h-16 object-contain rounded-xl" />
+          </div>
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <span className="text-sm font-medium text-blue-400">Signing in...</span>
+          </div>
+        </div>
+      )}
 
 
       <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full opacity-30"
