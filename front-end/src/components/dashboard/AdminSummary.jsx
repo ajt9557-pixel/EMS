@@ -55,7 +55,7 @@ const AdminSummary = () => {
         <img 
           src="/pics/aiics.jpg" 
           alt="" 
-          className="w-full h-full object-cover opacity-[0.07]" 
+          className="w-full h-full object-cover opacity-20" 
         />
       </div>
        <div className="relative z-10">

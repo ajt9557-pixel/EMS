@@ -6,11 +6,11 @@ const DashboardLayout = ({ sidebar, children }) => {
       <div className="ml-64 min-h-screen relative overflow-hidden">
         
   
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center p-10">
           <img 
             src="/pics/aiics.jpg" 
             alt="" 
-            className="w-full h-full object-cover opacity-15" 
+            className="w-full h-full object-contain mix-blend-multiply opacity-10" 
           />
         </div>
 

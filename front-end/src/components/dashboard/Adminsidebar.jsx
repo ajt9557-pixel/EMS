@@ -63,7 +63,7 @@ const AdminSidebar = () => {
           <DashboardIcon />
           Dashboard
         </NavLink>
-        <NavLink to="/admin-dashboard/employee-dashboard" end className={linkClasses}>
+        <NavLink to="/admin-dashboard/employee" end className={linkClasses}>
           <EmployeesIcon />
           Employees
         </NavLink>
