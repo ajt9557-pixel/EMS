@@ -1,20 +1,24 @@
-import Employee from "../models/employeeModel.js";
-import User from "../models/User.mjs";
+import Employee from "../models/Employee.js";
 import User from "../models/User.mjs";
 import bcrypt from "bcryptjs";
 import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+
+const uploadDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../public/uploads");
+fs.mkdirSync(uploadDir, { recursive: true });
 
 const storage = multer.diskStorage({
-    destination:(req, file, cb) => {
-        cb(null, "public/uploads")
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
     },
-    filename:(req, file, cb) => {
-        cb(null, Date.now() + "-" + path.extname(file.originalname))
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + "-" + path.extname(file.originalname));
     }
+});
 
-})
-
-const upload = multer({storage: storage})
+const upload = multer({ storage: storage });
 
 const addEmployee = async (req, res) => {
     try {
@@ -24,42 +28,37 @@ const addEmployee = async (req, res) => {
             password,
             role,
             employeeId,
-            dob, 
-            gender, 
-            maritalStatus, 
-            designation, 
+            dob,
+            gender,
+            maritalStatus,
+            designation,
             department,
-            salary 
+            salary
         } = req.body;
 
-        const User = await User.findOne({email})
-        if (User) {
-           return res.status(400).json({success: false, error: "User already exists"});
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ success: false, error: "User already exists" });
         }
 
-        const  hashpassword = await bcrypt.hash(password, 10)
+        const existingEmployee = await Employee.findOne({ employeeId });
+        if (existingEmployee) {
+            return res.status(400).json({ success: false, error: "Employee ID already exists" });
+        }
 
-        const newUser = newUser({
+        const hashpassword = await bcrypt.hash(password, 10);
+
+        const newUser = new User({
             name,
             email,
-            prifileImage: req.file ? req.file.filename : "",
+            profilePicture: req.file ? req.file.filename : "",
             password: hashpassword,
             role,
-            employeeId,
-            dob,
-            gender,
-            maritalStatus,
-            designation,
-            department,
-            salary,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        })
+        });
         await newUser.save();
-        res.status(200).json({success: true, message: "Employee added successfully"});
 
         const newEmployee = new Employee({
-            userID: savedUser._id,
+            userId: newUser._id,
             employeeId,
             dob,
             gender,
@@ -67,16 +66,54 @@ const addEmployee = async (req, res) => {
             designation,
             department,
             salary,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        })
-
+        });
         await newEmployee.save();
-        res.status(200).json({success: true, message: "Employee added successfully"});
+
+        res.status(200).json({ success: true, message: "Employee added successfully" });
     } catch (error) {
         console.log('ADD EMPLOYEE ERROR:', error);
-        res.status(500).json({success: false, error: "add employee server error"});
+        if (error.code === 11000) {
+            return res.status(400).json({ success: false, error: "Employee ID or email already exists" });
+        }
+        return res.status(500).json({ success: false, error: "add employee server error" });
     }
 }
 
-export  {addEmployee, upload}
+const getEmployees = async (req, res) => {
+    try {
+        const employees = await Employee.find()
+            .populate("userId", "name email profilePicture")
+            .populate("department", "dep_name")
+            .sort({ createdAt: -1 });
+        const data = employees.map((emp) => ({
+            _id: emp._id,
+            name: emp.userId?.name,
+            email: emp.userId?.email,
+            profilePicture: emp.userId?.profilePicture,
+            dep_name: emp.department?.dep_name,
+            salary: emp.salary,
+        }));
+        return res.status(200).json({ success: true, employees: data });
+    } catch (error) {
+        console.log('GET EMPLOYEES ERROR:', error);
+        return res.status(500).json({ success: false, error: "get employees server error" });
+    }
+}
+
+const deleteEmployee = async (req, res) => {
+    try {
+        const employee = await Employee.findByIdAndDelete(req.params.id);
+        if (!employee) {
+            return res.status(404).json({ success: false, error: "Employee not found" });
+        }
+        if (employee.userId) {
+            await User.findByIdAndDelete(employee.userId);
+        }
+        return res.status(200).json({ success: true, message: "Employee deleted successfully" });
+    } catch (error) {
+        console.log('DELETE EMPLOYEE ERROR:', error);
+        return res.status(500).json({ success: false, error: "delete employee server error" });
+    }
+}
+
+export { addEmployee, getEmployees, deleteEmployee, upload }

@@ -62,6 +62,7 @@ function DepartmentList() {
   }))
 
   return (
+    
     <div className="space-y-6">
       <div className="flex flex-col items-center gap-3 mb-6">
         <div className="relative">

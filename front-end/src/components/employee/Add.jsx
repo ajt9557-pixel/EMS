@@ -2,9 +2,12 @@ import React, { useEffect } from 'react'
 import { useState } from 'react'
 import { fetchDepartments } from "../../utils/EmployeeHelper.jsx";
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { API_URL } from '../../utils/api'
 
 const Add = () => {
 
+    const navigate = useNavigate()
     const [departments, setDepartments] = useState([])
     const [formdata, setFormData] = useState({})
     useEffect(() =>{
@@ -27,13 +30,13 @@ const Add = () => {
         e.preventDefault()
        
         const formDataObj = new FormData();
-        Object.keys(formData).forEach((key) => {
-            formDataObj.append(key, formData[key]);
+        Object.keys(formdata).forEach((key) => {
+            formDataObj.append(key, formdata[key]);
         })
         try{
             const response = await axios.post(`${API_URL}/api/employee/add`,
              formDataObj,
-             { headers: { authorization: `Bearer ${localStorage.getItem('token')}`,
+             { headers: { authorization: `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`,
             } 
             }
             )
@@ -102,7 +105,7 @@ const Add = () => {
               <input
                 type="email"
                 name="email"
-                handleChange={handleChange}
+                onChange={handleChange}
                 placeholder="Email"
                 className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
                 required
@@ -114,7 +117,7 @@ const Add = () => {
               <input
                 type="password"
                 name="password"
-                handleChange={handleChange}
+                onChange={handleChange}
                 placeholder="Password"
                 className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
                 required
@@ -126,6 +129,7 @@ const Add = () => {
               <input
                 type="password"
                 name="confirmPassword"
+                onChange={handleChange}
                 placeholder="Confirm Password"
                 className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
                 required
@@ -137,7 +141,7 @@ const Add = () => {
               <input
                 type="text"
                 name="employeeId"
-                handleChange={handleChange}
+                onChange={handleChange}
                 placeholder="Employee ID"
                 className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
                 required
@@ -149,7 +153,7 @@ const Add = () => {
               <input
                 type="date"
                 name="dob"
-                handleChange={handleChange}
+                onChange={handleChange}
                 className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
                 required
               />
@@ -159,7 +163,7 @@ const Add = () => {
               <label className="block text-sm font-medium text-gray-600 mb-1.5">Gender</label>
               <select
                 name="gender"
-                handleChange={handleChange}
+                onChange={handleChange}
                 className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
                 required
               >
@@ -173,7 +177,7 @@ const Add = () => {
               <label className="block text-sm font-medium text-gray-600 mb-1.5">Marital Status</label>
               <select
                 name="maritalStatus"
-                handleChange={handleChange}
+                onChange={handleChange}
                 className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
                 required
               >
@@ -188,7 +192,7 @@ const Add = () => {
               <input
                 type="text"
                 name="designation"
-                handleChange={handleChange}
+                onChange={handleChange}
                 placeholder="Designation"
                 className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
                 required
@@ -199,7 +203,7 @@ const Add = () => {
               <label className="block text-sm font-medium text-gray-600 mb-1.5">Department</label>
               <select
                 name="department"
-                handleChange={handleChange}
+                onChange={handleChange}
                 className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
                 required
               >
@@ -215,7 +219,7 @@ const Add = () => {
               <input
                 type="number"
                 name="salary"
-                handleChange={handleChange}
+                onChange={handleChange}
                 placeholder="Salary"
                 className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
                 required
@@ -226,7 +230,7 @@ const Add = () => {
               <label className="block text-sm font-medium text-gray-600 mb-1.5">Role</label>
               <select
                 name="role"
-                handleChange={handleChange}
+                onChange={handleChange}
                 className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
                 required
               >
@@ -240,8 +244,8 @@ const Add = () => {
               <label className="block text-sm font-medium text-gray-600 mb-1.5">Upload Photo</label>
               <input
                 type="file"
-                name="photo"
-                handleChange={handleChange}
+                name="image"
+                onChange={handleChange}
                 accept="image/*"
                 className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
               />

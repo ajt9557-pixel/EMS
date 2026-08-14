@@ -50,6 +50,7 @@ const LeaveRejectedIcon = () => (
 
 const AdminSummary = () => {
   return (
+    
     <div className="relative overflow-hidden rounded-2xl p-6 bg-gray-50 borfer border-gray-100  ">
        <div className="absolute inset-0 z-0 pointer-events-none">
         <img 
@@ -59,6 +60,24 @@ const AdminSummary = () => {
         />
       </div>
        <div className="relative z-10">
+        <div className="space-y-6">
+      <div className="flex flex-col items-center gap-3 mb-6">
+        <div className="relative">
+          <div className="w-24 h-24 rounded-full bg-white border-4 border-blue-100 shadow-xl shadow-blue-100 flex items-center justify-center overflow-hidden p-1.5">
+            <img
+              src="/pics/aiics.jpg"
+              alt="Company Logo"
+              className="w-full h-full object-contain rounded-full"
+            />
+          </div>
+          <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 border-2 border-white flex items-center justify-center">
+            <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
       <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         Dashboard Overview
       </h3>
