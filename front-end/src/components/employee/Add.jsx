@@ -216,14 +216,17 @@ const Add = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1.5">Salary</label>
-              <input
-                type="number"
-                name="salary"
-                onChange={handleChange}
-                placeholder="Salary"
-                className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
-                required
-              />
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">₱</span>
+                <input
+                  type="number"
+                  name="salary"
+                  onChange={handleChange}
+                  placeholder="0.00"
+                  className="w-full border border-blue-100 bg-blue-50/40 rounded-xl pl-8 pr-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
+                  required
+                />
+              </div>
             </div>
 
             <div>
