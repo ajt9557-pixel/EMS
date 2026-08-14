@@ -53,6 +53,7 @@ function List() {
     sno: index + 1,
     name: emp.name,
     email: emp.email,
+    profilePicture: emp.profilePicture,
     dep_name: emp.dep_name,
     salary: emp.salary,
     action: (

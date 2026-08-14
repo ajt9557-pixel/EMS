@@ -6,7 +6,7 @@ import path from "path";
 import fs from "fs";
 import os from "os";
 
-const uploadDir = path.join(os.tmpdir(), "uploads");
+export const uploadDir = path.join(os.tmpdir(), "uploads");
 try {
     fs.mkdirSync(uploadDir, { recursive: true });
 } catch (err) {

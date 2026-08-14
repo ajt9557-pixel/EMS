@@ -23,6 +23,19 @@ export const fetchDepartments = async () => {
 
 export const colums = [
     {
+        name: "Profile",
+        selector: row => row.profilePicture,
+        sortable: false,
+        center: true,
+        cell: row => row.profilePicture ? (
+            <img src={`${API_URL}/uploads/${row.profilePicture}`} alt={row.name} className="w-10 h-10 rounded-full object-cover border border-gray-100" />
+        ) : (
+            <div className="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-sm font-semibold text-blue-600">
+                {row.name?.charAt(0).toUpperCase()}
+            </div>
+        )
+    },
+    {
         name: "SNo.",
         selector: row => row.sno,
         sortable: true,
