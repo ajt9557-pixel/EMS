@@ -50,7 +50,8 @@ export const colums = [
         name: "Salary",
         selector: row => row.salary,
         sortable: true,
-        center: true
+        center: true,
+        cell: row => "₱" + Number(row.salary).toLocaleString()
     },
     {
         name: "Action",
