@@ -4,10 +4,14 @@ import bcrypt from "bcryptjs";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { fileURLToPath } from "url";
+import os from "os";
 
-const uploadDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../public/uploads");
-fs.mkdirSync(uploadDir, { recursive: true });
+const uploadDir = path.join(os.tmpdir(), "uploads");
+try {
+    fs.mkdirSync(uploadDir, { recursive: true });
+} catch (err) {
+    console.log("MULTER UPLOAD DIR CREATE FAILED:", err);
+}
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
