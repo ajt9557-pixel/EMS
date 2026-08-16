@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useState } from "react";
 import { API_URL } from "./api";
 
 export const fetchDepartments = async () => {
@@ -21,19 +22,28 @@ export const fetchDepartments = async () => {
   return departments;
 };
 
+const ProfileAvatar = ({ row }) => {
+  const [failed, setFailed] = useState(false);
+  const src = row.profilePicture?.startsWith("data:")
+    ? row.profilePicture
+    : row.profilePicture ? `${API_URL}/uploads/${row.profilePicture}` : null;
+  if (!src || failed) {
+    return (
+      <div className="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-sm font-semibold text-blue-600">
+        {row.name?.charAt(0).toUpperCase()}
+      </div>
+    );
+  }
+  return <img src={src} alt={row.name} className="w-10 h-10 rounded-full object-cover border border-gray-100" onError={() => setFailed(true)} />;
+};
+
 export const colums = [
     {
         name: "Profile",
         selector: row => row.profilePicture,
         sortable: false,
         center: true,
-        cell: row => row.profilePicture ? (
-            <img src={`${API_URL}/uploads/${row.profilePicture}`} alt={row.name} className="w-10 h-10 rounded-full object-cover border border-gray-100" />
-        ) : (
-            <div className="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-sm font-semibold text-blue-600">
-                {row.name?.charAt(0).toUpperCase()}
-            </div>
-        )
+        cell: row => <ProfileAvatar row={row} />
     },
     {
         name: "SNo.",
@@ -70,13 +80,26 @@ export const colums = [
         name: "Action",
         selector: row => row.action,
         sortable: true,
-        center: true
+        center: true,
+        minWidth: "310px",
+        allowOverflow: true
     }
 ]
 
-export const EmployeeButtons = ({ onEdit, onDelete }) => {
+export const EmployeeButtons = ({ onView, onEdit, onDelete }) => {
     return (
         <div className="flex items-center justify-center gap-2">
+            <button
+                type="button"
+                onClick={onView}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-lg transition-colors"
+            >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                View
+            </button>
             <button
                 type="button"
                 onClick={onEdit}
@@ -86,6 +109,15 @@ export const EmployeeButtons = ({ onEdit, onDelete }) => {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                 </svg>
                 Edit
+            </button>
+            <button
+                type="button"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 px-3 py-1.5 rounded-lg transition-colors"
+            >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Salary
             </button>
             <button
                 type="button"

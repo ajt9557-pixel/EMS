@@ -58,7 +58,8 @@ function List() {
     salary: emp.salary,
     action: (
       <EmployeeButtons
-        onEdit={() => navigate(`/admin-dashboard/employee/${emp._id}`)}
+        onView={() => navigate(`/admin-dashboard/employee/${emp._id}/view`, { state: { employee: emp } })}
+        onEdit={() => navigate(`/admin-dashboard/employee/edit/${emp._id}`, { state: { employee: emp } })}
         onDelete={() => handleDelete(emp._id)}
       />
     )

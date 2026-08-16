@@ -35,7 +35,7 @@ const addEmployee = async (req, res) => {
             dob,
             gender,
             maritalStatus,
-            designation,
+            placeOfBirth,
             department,
             salary
         } = req.body;
@@ -67,7 +67,7 @@ const addEmployee = async (req, res) => {
             dob,
             gender,
             maritalStatus,
-            designation,
+            placeOfBirth,
             department,
             salary,
         });
@@ -86,7 +86,7 @@ const addEmployee = async (req, res) => {
 const getEmployees = async (req, res) => {
     try {
         const employees = await Employee.find()
-            .populate("userId", "name email profilePicture")
+            .populate("userId", "name email profilePicture role")
             .populate("department", "dep_name")
             .sort({ createdAt: -1 });
         const data = employees.map((emp) => ({
@@ -94,13 +94,106 @@ const getEmployees = async (req, res) => {
             name: emp.userId?.name,
             email: emp.userId?.email,
             profilePicture: emp.userId?.profilePicture,
+            role: emp.userId?.role,
+            employeeId: emp.employeeId,
+            placeOfBirth: emp.placeOfBirth,
             dep_name: emp.department?.dep_name,
+            department: emp.department?._id,
             salary: emp.salary,
+            gender: emp.gender,
+            maritalStatus: emp.maritalStatus,
+            dob: emp.dob,
         }));
         return res.status(200).json({ success: true, employees: data });
     } catch (error) {
         console.log('GET EMPLOYEES ERROR:', error);
         return res.status(500).json({ success: false, error: "get employees server error" });
+    }
+}
+
+const getEmployee = async (req, res) => {
+    try {
+        const employee = await Employee.findById(req.params.id)
+            .populate("userId", "name email profilePicture role")
+            .populate("department", "dep_name");
+        if (!employee) {
+            return res.status(404).json({ success: false, error: "Employee not found" });
+        }
+        return res.status(200).json({
+            success: true,
+            employee: {
+                _id: employee._id,
+                employeeId: employee.employeeId,
+                name: employee.userId?.name,
+                email: employee.userId?.email,
+                profilePicture: employee.userId?.profilePicture,
+                role: employee.userId?.role,
+                placeOfBirth: employee.placeOfBirth,
+                department: employee.department ? { _id: employee.department._id, dep_name: employee.department.dep_name } : null,
+                dep_name: employee.department?.dep_name,
+                salary: employee.salary,
+                gender: employee.gender,
+                maritalStatus: employee.maritalStatus,
+                dob: employee.dob,
+            },
+        });
+    } catch (error) {
+        console.log('GET EMPLOYEE ERROR:', error);
+        return res.status(500).json({ success: false, error: "get employee server error" });
+    }
+}
+
+const updateEmployee = async (req, res) => {
+    try {
+        const employee = await Employee.findById(req.params.id);
+        if (!employee) {
+            return res.status(404).json({ success: false, error: "Employee not found" });
+        }
+
+        const {
+            name,
+            email,
+            password,
+            employeeId,
+            dob,
+            gender,
+            maritalStatus,
+            placeOfBirth,
+            department,
+            salary,
+            role
+        } = req.body;
+
+        if (employee.userId) {
+            const user = await User.findById(employee.userId);
+            if (user) {
+                if (name !== undefined) user.name = name;
+                if (email !== undefined) user.email = email;
+                if (role !== undefined) user.role = role;
+                if (req.file) user.profilePicture = req.file.filename;
+                if (password && password.trim() !== "") {
+                    user.password = await bcrypt.hash(password, 10);
+                }
+                await user.save();
+            }
+        }
+
+        if (employeeId !== undefined) employee.employeeId = employeeId;
+        if (dob !== undefined) employee.dob = dob;
+        if (gender !== undefined) employee.gender = gender;
+        if (maritalStatus !== undefined) employee.maritalStatus = maritalStatus;
+        if (placeOfBirth !== undefined) employee.placeOfBirth = placeOfBirth;
+        if (department !== undefined) employee.department = department;
+        if (salary !== undefined) employee.salary = salary;
+        await employee.save();
+
+        return res.status(200).json({ success: true, message: "Employee updated successfully" });
+    } catch (error) {
+        console.log('UPDATE EMPLOYEE ERROR:', error);
+        if (error.code === 11000) {
+            return res.status(400).json({ success: false, error: "Employee ID already exists" });
+        }
+        return res.status(500).json({ success: false, error: "update employee server error" });
     }
 }
 
@@ -120,4 +213,4 @@ const deleteEmployee = async (req, res) => {
     }
 }
 
-export { addEmployee, getEmployees, deleteEmployee, upload }
+export { addEmployee, getEmployees, getEmployee, updateEmployee, deleteEmployee, upload }
