@@ -8,7 +8,7 @@ import connectDB from './db/db.mjs';
 import departmentRouter from './routes/department.js';
 import employeeRouter from './routes/employee.js';
 import { uploadDir } from './controllers/employeeController.js';
-import salaryRouter from './routes/salary.js';
+import salaryRouter from './routes/Salary.js';
 connectDB().catch((err) => console.log('DB CONNECT ERROR:', err.message));
 const app = express();
 app.use(cors());
