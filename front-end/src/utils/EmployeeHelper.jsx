@@ -22,6 +22,26 @@ export const fetchDepartments = async () => {
   return departments;
 };
 
+export const getEmployees = async (id) => {
+  let employees = [];
+  try {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const response = await axios.get(`${API_URL}/api/employee/department/${id}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.data.success) {
+      employees = response.data.employees;
+    }
+  } catch (error) {
+    if (error.response && !error.response.data.success) {
+      alert(error.response.data.error);
+    }
+  }
+  return employees;
+};
+
 const ProfileAvatar = ({ row }) => {
   const [failed, setFailed] = useState(false);
   const src = row.profilePicture?.startsWith("data:")
@@ -86,7 +106,7 @@ export const colums = [
     }
 ]
 
-export const EmployeeButtons = ({ onView, onEdit, onDelete }) => {
+export const EmployeeButtons = ({ onView, onEdit, onSalary, onDelete }) => {
     return (
         <div className="flex items-center justify-center gap-2">
             <button
@@ -112,6 +132,7 @@ export const EmployeeButtons = ({ onView, onEdit, onDelete }) => {
             </button>
             <button
                 type="button"
+                onClick={onSalary}
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 px-3 py-1.5 rounded-lg transition-colors"
             >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

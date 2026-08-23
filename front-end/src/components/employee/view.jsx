@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
-import { useParams, useLocation, Link } from 'react-router-dom'
+import { useParams, useLocation, useNavigate, Link } from 'react-router-dom'
 import axios from 'axios'
 import { API_URL } from '../../utils/api'
+import { useAuth } from '../../context/authcontext'
 
-const View = () => {
+const View = ({ employee: passedEmployee }) => {
     const { id } = useParams()
     const location = useLocation()
-    const [employee, setEmployee] = useState(location.state?.employee || null)
-    const [loading, setLoading] = useState(!location.state?.employee)
+    const navigate = useNavigate()
+    const { user } = useAuth()
+    const [employee, setEmployee] = useState(passedEmployee || location.state?.employee || null)
+    const [loading, setLoading] = useState(!(passedEmployee || location.state?.employee))
     const [error, setError] = useState(null)
     const [imageFailed, setImageFailed] = useState(false)
 
@@ -133,15 +136,28 @@ const View = () => {
                     </div>
 
                     <div className="mt-6 flex justify-center">
-                        <Link
-                            to="/admin-dashboard/employee"
-                            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-blue-200 hover:shadow-blue-300 transition-all duration-200 active:scale-[0.98]"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                            </svg>
-                            Back to Employees
-                        </Link>
+                        {user?.role === "admin" ? (
+                            <Link
+                                to="/admin-dashboard/employee"
+                                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-blue-200 hover:shadow-blue-300 transition-all duration-200 active:scale-[0.98]"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                                </svg>
+                                Back to Employees
+                            </Link>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={() => navigate(-1)}
+                                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-blue-200 hover:shadow-blue-300 transition-all duration-200 active:scale-[0.98]"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                                </svg>
+                                Back to Dashboard
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

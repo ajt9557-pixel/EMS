@@ -60,6 +60,7 @@ function List() {
       <EmployeeButtons
         onView={() => navigate(`/admin-dashboard/employee/${emp._id}/view`, { state: { employee: emp } })}
         onEdit={() => navigate(`/admin-dashboard/employee/edit/${emp._id}`, { state: { employee: emp } })}
+        onSalary={() => navigate(`/admin-dashboard/salary/${emp._id}`)}
         onDelete={() => handleDelete(emp._id)}
       />
     )

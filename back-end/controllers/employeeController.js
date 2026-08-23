@@ -143,6 +143,38 @@ const getEmployee = async (req, res) => {
     }
 }
 
+const getMyProfile = async (req, res) => {
+    try {
+        const employee = await Employee.findOne({ userId: req.user._id })
+            .populate("userId", "name email profilePicture role")
+            .populate("department", "dep_name");
+        if (!employee) {
+            return res.status(404).json({ success: false, error: "No employee profile is linked to this account" });
+        }
+        return res.status(200).json({
+            success: true,
+            employee: {
+                _id: employee._id,
+                employeeId: employee.employeeId,
+                name: employee.userId?.name,
+                email: employee.userId?.email,
+                profilePicture: employee.userId?.profilePicture,
+                role: employee.userId?.role,
+                placeOfBirth: employee.placeOfBirth,
+                department: employee.department ? { _id: employee.department._id, dep_name: employee.department.dep_name } : null,
+                dep_name: employee.department?.dep_name,
+                salary: employee.salary,
+                gender: employee.gender,
+                maritalStatus: employee.maritalStatus,
+                dob: employee.dob,
+            },
+        });
+    } catch (error) {
+        console.log('MY PROFILE ERROR:', error);
+        return res.status(500).json({ success: false, error: "get my profile server error" });
+    }
+}
+
 const updateEmployee = async (req, res) => {
     try {
         const employee = await Employee.findById(req.params.id);
@@ -213,4 +245,31 @@ const deleteEmployee = async (req, res) => {
     }
 }
 
-export { addEmployee, getEmployees, getEmployee, updateEmployee, deleteEmployee, upload }
+ const fetchEmployeesByDepId = async (req, res) => {
+     try {
+        const employees = await Employee.find({ department: req.params.id })
+            .populate("userId", "name email profilePicture role")
+            .populate("department", "dep_name");
+        const data = employees.map((emp) => ({
+            _id: emp._id,
+            employeeId: emp.employeeId,
+            name: emp.userId?.name,
+            email: emp.userId?.email,
+            profilePicture: emp.userId?.profilePicture,
+            role: emp.userId?.role,
+            placeOfBirth: emp.placeOfBirth,
+            department: emp.department ? { _id: emp.department._id, dep_name: emp.department.dep_name } : null,
+            dep_name: emp.department?.dep_name,
+            salary: emp.salary,
+            gender: emp.gender,
+            maritalStatus: emp.maritalStatus,
+            dob: emp.dob,
+        }));
+        return res.status(200).json({ success: true, employees: data });
+    } catch (error) {
+        console.log('GET EMPLOYEES BY DEP ERROR:', error);
+        return res.status(500).json({ success: false, error: "get employees server error" });
+    }
+ }
+
+export { addEmployee, getEmployees, getEmployee, getMyProfile, updateEmployee, deleteEmployee, upload , fetchEmployeesByDepId};

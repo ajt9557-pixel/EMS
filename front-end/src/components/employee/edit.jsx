@@ -60,6 +60,9 @@ const Edit = () => {
                 if (employee[key]) formDataObj.append('image', employee[key]);
             } else if (key === 'confirmPassword') {
                 return;
+            } else if (key === 'department') {
+                const depId = employee.department?._id || employee.department;
+                if (depId) formDataObj.append('department', depId);
             } else {
                 formDataObj.append(key, employee[key]);
             }

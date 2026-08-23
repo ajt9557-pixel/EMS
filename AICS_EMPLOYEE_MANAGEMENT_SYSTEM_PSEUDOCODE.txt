@@ -1,9 +1,9 @@
-====================================================================
+
  AICS EMPLOYEE MANAGEMENT SYSTEM - COMPLETE PSEUDO CODE
-====================================================================
+
 
 1. AUTHENTICATION MODULE
-====================================================================
+
 FUNCTION LOGIN(email, password, rememberMe):
     IF email == "" OR password == "":
         SHOW ERROR "Please fill in all fields"
@@ -53,9 +53,7 @@ FUNCTION VERIFY_SESSION():
         IF response.success: SET user in AuthContext
         ELSE: LOGOUT()
 
-====================================================================
 2. ROUTING / ACCESS CONTROL
-====================================================================
 ROUTES:
     "/"                        -> redirect to /login
     "/login"                   -> Login page (public)
@@ -73,9 +71,9 @@ MIDDLEWARE ROLE_BASE_ROUTE(component, requiredRoles):
     ELSE:
         RENDER component
 
-====================================================================
+
 3. DASHBOARD LAYOUT (shared)
-====================================================================
+
 LAYOUT dashboardLayout(sidebar, content):
     RENDER sidebar (fixed, left side)
     RENDER navbar (welcome message + logout button)
@@ -89,9 +87,9 @@ SIDEBAR menu (admin):
     - Salary               -> /admin-dashboard/salary-dashboard
     - Settings             -> /settings
 
-====================================================================
+
 4. ADMIN SUMMARY / DASHBOARD MODULE
-====================================================================
+
 FUNCTION LOAD_DASHBOARD():
     totalEmployees   = GET /api/stats/total-employees
     totalDepartments = GET /api/stats/total-departments
@@ -102,9 +100,8 @@ FUNCTION LOAD_DASHBOARD():
         [Total Employees]   [Total Departments]   [Monthly Salary]
         [Leave Applied]     [Leave Approved]      [Leave Pending]  [Leave Rejected]
 
-====================================================================
 5. EMPLOYEE MODULE (CRUD)
-====================================================================
+
 FUNCTION VIEW_EMPLOYEES(searchKeyword):
     IF searchKeyword != "":
         employees = GET /api/employees?search=searchKeyword
@@ -131,9 +128,8 @@ FUNCTION DELETE_EMPLOYEE(id):
     response = DELETE /api/employees/id
     IF success: REMOVE from list, SHOW "Employee deleted"
 
-====================================================================
+
 6. DEPARTMENT MODULE (CRUD)
-====================================================================
 FUNCTION VIEW_DEPARTMENTS(searchKeyword):
     departments = GET /api/departments
     FILTER by searchKeyword (name match)
@@ -156,9 +152,7 @@ FUNCTION DELETE_DEPARTMENT(id):
     response = DELETE /api/departments/id
     IF success: REFRESH list
 
-====================================================================
 7. LEAVE MODULE
-====================================================================
 EMPLOYEE:
     FUNCTION APPLY_LEAVE(leaveData):
         VALIDATE (dates, type, reason)
@@ -182,9 +176,7 @@ ADMIN:
         response = PUT /api/leaves/leaveId/reject { reason }
         IF success: UPDATE status to "rejected"
 
-====================================================================
 8. SALARY MODULE
-====================================================================
 FUNCTION VIEW_SALARY():
     salaryRecords = GET /api/salary
 
@@ -194,9 +186,7 @@ FUNCTION VIEW_SALARY():
     DISPLAY: Gross pay, Deductions, Net pay, Pay date
     PRINT payslip option
 
-====================================================================
 9. SETTINGS MODULE
-====================================================================
 FUNCTION UPDATE_PROFILE(data):
     response = PUT /api/users/me { data }
     IF success: UPDATE AuthContext user
@@ -206,9 +196,7 @@ FUNCTION CHANGE_PASSWORD(oldPassword, newPassword):
     response = PUT /api/users/me/password { old, new }
     IF success: SHOW "Password changed"
 
-====================================================================
 10. COMMON UI PATTERNS
-====================================================================
 LOADING: Show overlay with logo + spinner on every async request
 ERROR:   Show red alert box with message from server
 SUCCESS: Show green toast/notification
