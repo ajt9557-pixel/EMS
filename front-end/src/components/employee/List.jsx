@@ -82,7 +82,7 @@ function List() {
         onEdit={() => navigate(`/admin-dashboard/employee/edit/${emp._id}`, { state: { employee: emp } })}
         onSalary={() => navigate(`/admin-dashboard/salary/${emp._id}`)}
         onDelete={() => handleDelete(emp._id)}
-        onLeave={() => navigate(`/admin-dashboard/leave/${emp._id}`)}
+        onLeave={() => navigate(`/admin-dashboard/employee/${emp._id}/leaves`)}
       />
     )
   }));

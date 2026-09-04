@@ -66,6 +66,26 @@ const getLeaves = async (req, res) => {
         }
     }
 
+const getLeavesByEmployee = async (req, res) => {
+    try {
+        const { employeeId } = req.params;
+        const leaves = await Leave.find({ employeeId })
+            .populate({
+                path: "employeeId",
+                populate: [
+                    { path: 'department', select: 'dep_name' },
+                    { path: 'userId', select: 'name email profilePicture' },
+                ],
+            })
+            .sort({ appliedAt: -1 });
+        const validLeaves = leaves.filter(l => l.employeeId && l.employeeId.userId);
+        return res.status(200).json({ success: true, leaves: validLeaves });
+    } catch (error) {
+        console.log('GET LEAVES BY EMPLOYEE ERROR:', error);
+        return res.status(500).json({ success: false, error: "get employee leaves server error" });
+    }
+}
+
 const getLeave = async (req, res) => {
     try {
         const leave = await Leave.findById(req.params.id).populate({
@@ -108,4 +128,4 @@ const updateLeave = async (req, res) => {
     }
 }
 
-export { addLeave, getMyLeaves , getLeaves, getLeave, updateLeave };
+export { addLeave, getMyLeaves , getLeaves, getLeave, updateLeave, getLeavesByEmployee };

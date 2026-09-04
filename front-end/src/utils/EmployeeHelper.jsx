@@ -143,10 +143,10 @@ export const EmployeeButtons = ({
   const navigate = useNavigate();
   
   const handleLeave = () => {
-    if (row?.id) {
-      navigate(`/admin-dashboard/employee/leave/${row.id}`);
+    if (onLeave) {
+      onLeave();
     } else {
-      console.warn("Employee ID not found");
+      console.warn("onLeave handler not provided");
     }
   };
 
@@ -202,10 +202,10 @@ export const EmployeeButtons = ({
       </button>
 
      
-      {onLeave && (
+     
         <button
           type="button"
-          onClick={handleLeave}
+         onClick={() => navigate(`/admin-dashboard/employee/leave/${Id}`)}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 border border-purple-100 px-3 py-1.5 rounded-lg transition-colors"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -213,7 +213,7 @@ export const EmployeeButtons = ({
           </svg>
           Leave
         </button>
-      )}
+      
     </div>
   );
 };

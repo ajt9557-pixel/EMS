@@ -22,6 +22,7 @@ import AddLeave from './components/Leaves/AddLeave.jsx';
 import Settings from './components/EmployeeDashboard/Settings.jsx';
 import Table from './components/Leaves/Table.jsx';
 import LeaveDetails from './components/Leaves/LeaveDetails.jsx';
+import EmployeeLeaveHistory from './components/Leaves/EmployeeLeaveHistory.jsx';
   
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
           <Route path="employee/edit/:id" element={<Edit/>} />
           <Route path="Leaves" element={<Table/>} />
           <Route path="leave/:id" element={<LeaveDetails />} />
+          <Route path="employee/:id/leaves" element={<EmployeeLeaveHistory />} />
         </Route>
 
       <Route path="/employee-dashboard" element={
