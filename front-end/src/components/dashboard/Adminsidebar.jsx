@@ -43,15 +43,14 @@ const AdminSidebar = () => {
   const linkClasses = ({ isActive }) =>
     `flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
       isActive
-        ? "bg-blue-100 text-blue-700"
-        : "text-gray-500 hover:bg-blue-50 hover:text-gray-800"
+        ?  "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+        : "text-gray-500 hover:bg-blue-50 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
     }`;
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-100 h-screen fixed left-0 top-0 flex flex-col shadow-sm">
-      
+    <aside className="w-64 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-700 h-screen fixed left-0 top-0 flex flex-col shadow-sm">      
    
-      <div className="h-16 flex items-center justify-center border-b border-gray-100">
+      <div className="h-16 flex items-center justify-center border-b border-gray-100 dark:border-gray-700">
         <h3 className="text-lg font-bold text-blue-600 tracking-wide">
           Employee MS
         </h3>
@@ -71,7 +70,7 @@ const AdminSidebar = () => {
           <DepartmentsIcon />
           Departments
         </NavLink>
-        <NavLink to="/admin-dashboard/Leave-dashboard" end className={linkClasses}>
+        <NavLink to="/admin-dashboard/leaves" end className={linkClasses}>
           <LeavesIcon />
           Leaves
         </NavLink>

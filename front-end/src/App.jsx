@@ -16,10 +16,12 @@ import Salary from "./components/salar/Add.jsx";
 import SalaryList from "./components/salar/SalaryList.jsx";
 import AddSalary from "./components/salar/Add.jsx";
 import Summary from './components/EmployeeDashboard/Summary.jsx';
-import Placeholder from './components/EmployeeDashboard/Placeholder.jsx';
 import LeaveList from './components/Leaves/Leavelist.jsx';
 import MyProfile from './components/EmployeeDashboard/MyProfile.jsx';
 import AddLeave from './components/Leaves/AddLeave.jsx';
+import Settings from './components/EmployeeDashboard/Settings.jsx';
+import Table from './components/Leaves/Table.jsx';
+import LeaveDetails from './components/Leaves/LeaveDetails.jsx';
   
 function App() {
   return (
@@ -45,8 +47,10 @@ function App() {
           <Route path="view/:id" element={<AddSalary />} />
           <Route path="addSalary/:id" element={<AddSalary />} />
           <Route path="add-employee" element={<Add/>} />
-          <Route path="employee/:id/view" element={<View/>} />
+          <Route path="employee/:id/view" element={<View />} />
           <Route path="employee/edit/:id" element={<Edit/>} />
+          <Route path="Leaves" element={<Table/>} />
+          <Route path="leave/:id" element={<LeaveDetails />} />
         </Route>
 
       <Route path="/employee-dashboard" element={
@@ -60,9 +64,8 @@ function App() {
           <Route path="Profile" element={<MyProfile />} />
           <Route path="Leaves" element={<LeaveList />} />
           <Route path="salary" element={<SalaryList selfService />} />
-          <Route path="salary/:id" element={<SalaryList />} />
           <Route path="add-leave" element={<AddLeave />} />
-          <Route path="Settings" element={<Placeholder title="Settings" description="Account settings will be available here." />} />
+          <Route path="Settings" element={<Settings />} />
         </Route>
     </Routes>
   )

@@ -1,106 +1,123 @@
-import React from 'react'
-import SummaryCard from './SummaryCard'
-
-
-const EmployeesIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
-  </svg>
-);
-
-const DepartmentsIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1h-3zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5zM1.5 4h13a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5z" />
-  </svg>
-);
-
-const SalaryIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M4 10.781c.148 1.667 1.713 2.77 3.572 2.77 1.998 0 3.53-1.165 3.53-2.828 0-1.354-1.11-2.264-2.828-2.77-1.562-.469-2.553-.894-2.553-1.86 0-.963.832-1.656 2.075-1.656 1.166 0 1.957.744 2.1 1.805h1.62c-.148-1.616-1.466-2.966-3.478-3.166V1h-1.5v1.095C4.404 2.295 3.15 3.566 3.15 5.17c0 1.656 1.435 2.578 3.15 3.047.028.008.055.016.083.023 1.538.454 2.467.906 2.467 1.79 0 .93-.862 1.63-2.21 1.63-1.356 0-2.278-.821-2.45-1.98H2.83z" />
-  </svg>
-);
-
-const LeaveAppliedIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
-  </svg>
-);
-
-const LeaveApprovedIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-    <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z" />
-  </svg>
-);
-
-const LeavePendingIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
-    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
-  </svg>
-);
-
-const LeaveRejectedIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-  </svg>
-);
-
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import { API_URL } from '../../utils/api'
+import { useAuth } from '../../context/authcontext'
 
 const AdminSummary = () => {
-  return (
-    
-    <div className="relative overflow-hidden rounded-2xl p-6 bg-gray-50 borfer border-gray-100  ">
-       <div className="absolute inset-0 z-0 pointer-events-none">
-        <img 
-          src="/pics/aiics.jpg" 
-          alt="" 
-          className="w-full h-full object-cover opacity-20" 
-        />
-      </div>
-       <div className="relative z-10">
-        <div className="space-y-6">
-      <div className="flex flex-col items-center gap-3 mb-6">
-        <div className="relative">
-          <div className="w-24 h-24 rounded-full bg-white border-4 border-blue-100 shadow-xl shadow-blue-100 flex items-center justify-center overflow-hidden p-1.5">
-            <img
-              src="/pics/aiics.jpg"
-              alt="Company Logo"
-              className="w-full h-full object-contain rounded-full"
-            />
-          </div>
-          <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 border-2 border-white flex items-center justify-center">
-            <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-            </svg>
-          </div>
-        </div>
-      </div>
+  const { user } = useAuth()
+  const [employees, setEmployees] = useState([])
+  const [departments, setDepartments] = useState([])
+  const [leaves, setLeaves] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+  const authHeader = { headers: { authorization: `Bearer ${token}` } }
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [empRes, depRes, leaveRes] = await Promise.all([
+          axios.get(`${API_URL}/api/employee`, authHeader),
+          axios.get(`${API_URL}/api/department`, authHeader),
+          axios.post(`${API_URL}/api/leave`, {}, authHeader)
+        ])
+        if (empRes.data.success) setEmployees(empRes.data.employees)
+        if (depRes.data.success) setDepartments(depRes.data.departments)
+        if (leaveRes.data.success) setLeaves(leaveRes.data.leaves)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const totalEmployees = employees.length
+  const totalDepartments = departments.length
+  const monthlySalary = employees.reduce((sum, e) => sum + (e.salary || 0), 0)
+  const monthlySalaryDisplay = "₱" + monthlySalary.toLocaleString()
+  const approvedLeaves = leaves.filter(leave => leave.status === 'approved').length
+  const pendingLeaves = leaves.filter(leave => leave.status === 'pending').length
+  const rejectedLeaves = leaves.filter(leave => leave.status === 'rejected').length
+  const totalLeaves = leaves.length
+
+  const profileStatus = user && user.role === 'admin' ? 'Admin' : 'Employee'
+
+  const mainCards = [
+    { label: "Total Employees", value: totalEmployees, color: "from-blue-500 to-blue-600" },
+    { label: "Total Departments", value: totalDepartments, color: "from-indigo-500 to-purple-600" },
+    { label: "Monthly Salary", value: monthlySalaryDisplay, color: "from-emerald-500 to-green-600" },
+    { label: "Profile Status", value: profileStatus, color: "from-purple-500 to-fuchsia-600" },
+  ]
+
+  const leaveCards = [
+    { label: "Leave Applied", value: totalLeaves, color: "from-blue-500 to-blue-600" },
+    { label: "Leave Approved", value: approvedLeaves, color: "from-emerald-500 to-green-600" },
+    { label: "Leave Pending", value: pendingLeaves, color: "from-amber-500 to-orange-600" },
+    { label: "Leave Rejected", value: rejectedLeaves, color: "from-red-500 to-rose-600" },
+  ]
+
+  const StatCard = ({ card }) => (
+    <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm p-5 group hover:shadow-md transition-shadow duration-200">
+      <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${card.color} rounded-bl-[3rem] opacity-10 group-hover:opacity-20 transition-opacity`} />
+      <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{card.label}</p>
+      <p className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-2">{card.value}</p>
     </div>
-      <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-        Dashboard Overview
-      </h3>
+  )
 
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <SummaryCard icon={EmployeesIcon} text="Total Employees" number={5} color="blue" />
-        <SummaryCard icon={DepartmentsIcon} text="Total Departments" number={3} color="blue" />
-        <SummaryCard icon={SalaryIcon} text="Monthly Salary" number="₱25,000" color="green" />
-      </div>
-
-   
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <h4 className="text-sm font-bold text-gray-700 mb-4">Leave Details</h4>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <SummaryCard icon={LeaveAppliedIcon} text="Leave Applied" number={2} color="blue" />
-          <SummaryCard icon={LeaveApprovedIcon} text="Leave Approved" number={2} color="green" />
-          <SummaryCard icon={LeavePendingIcon} text="Leave Pending" number={1} color="orange" />
-          <SummaryCard icon={LeaveRejectedIcon} text="Leave Rejected" number={2} color="red" />
+  return (
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-2xl p-6 sm:p-8 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
+          <img src="/pics/aiics.jpg" alt="" className="w-full h-full object-cover" />
+        </div>
+        <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur border-2 border-white/40 shadow-xl flex items-center justify-center overflow-hidden p-1 shrink-0">
+              <img
+                src="/pics/aiics.jpg"
+                alt="Company Logo"
+                className="w-full h-full object-contain rounded-full"
+              />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-blue-100">Dashboard Overview</p>
+              <h2 className="text-2xl font-bold mt-1">
+                Welcome, {user ? user.name.split(' ')[0] : 'Admin'}
+              </h2>
+              <p className="text-sm text-blue-100 mt-1">Overview of your organization's workforce and leave activity</p>
+            </div>
+          </div>
         </div>
       </div>
-     </div>
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <svg className="w-10 h-10 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <p className="text-sm text-gray-400 dark:text-gray-500">Loading dashboard...</p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {mainCards.map((card) => <StatCard key={card.label} card={card} />)}
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+              <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Leave Details</h4>
+            </div>
+            <div className="p-5">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {leaveCards.map((card) => <StatCard key={card.label} card={card} />)}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }

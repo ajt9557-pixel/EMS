@@ -6,3 +6,4 @@
   --font-open-sans: 'Open Sans', sans-serif;
   --font-rubik: 'Rubik Spray Paint', cursive;
 }
+@custom-variant dark (&:where(.dark, .dark *)); 

@@ -4,9 +4,12 @@ import bcrypt from "bcryptjs";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import os from "os";
+import { fileURLToPath } from "url";
 
-export const uploadDir = path.join(os.tmpdir(), "uploads");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export const uploadDir = path.join(__dirname, "..", "uploads");
 try {
     fs.mkdirSync(uploadDir, { recursive: true });
 } catch (err) {

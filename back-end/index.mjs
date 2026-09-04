@@ -9,6 +9,8 @@ import departmentRouter from './routes/department.js';
 import employeeRouter from './routes/employee.js';
 import { uploadDir } from './controllers/employeeController.js';
 import salaryRouter from './routes/Salary.js';
+import LeaveRouter from './routes/Leave.js';
+import settingsRouter from './routes/Settings.js';
 connectDB().catch((err) => console.log('DB CONNECT ERROR:', err.message));
 const app = express();
 app.use(cors());
@@ -18,6 +20,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/department', departmentRouter);
 app.use('/api/employee', employeeRouter);
 app.use('/api/salary', salaryRouter);
+app.use('/api/leave', LeaveRouter);
+app.use('/api/settings', settingsRouter);
+
+
 
 export default app;
 

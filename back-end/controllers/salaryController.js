@@ -30,9 +30,17 @@ const addSalary = async (req, res) => {
 const getSalaries = async (req, res) => {
     try {
         const { employeeId } = req.params;
-        const salaries = await Salary.find({ employeeId })
+        let salaries = await Salary.find({ employeeId })
             .populate("employeeId", "employeeId")
             .sort({ payDate: -1 });
+        if (salaries.length === 0) {
+            const employee = await Employee.findOne({ userId: employeeId });
+            if (employee) {
+                salaries = await Salary.find({ employeeId: employee._id })
+                    .populate("employeeId", "employeeId")
+                    .sort({ payDate: -1 });
+            }
+        }
         const data = salaries.map((s) => ({
             _id: s._id,
             employeeId: s.employeeId?.employeeId,

@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { API_URL } from '../../utils/api'
 import Datatable from 'react-data-table-component'
+import { useTheme } from '../../context/ThemeContext'
 
 const columns = [
     {
@@ -49,6 +50,8 @@ const columns = [
 ]
 
 const SalaryList = ({ selfService = false }) => {
+    const { theme } = useTheme()
+    const isDark = theme === 'dark'
     const { id } = useParams()
     const navigate = useNavigate()
     const location = useLocation()
@@ -87,13 +90,29 @@ const SalaryList = ({ selfService = false }) => {
         payDate: s.payDate,
     }))
 
+    const latest = salaries[0]
+    const statCards = [
+        { label: "Total Records", value: salaries.length, color: "from-blue-500 to-blue-600" },
+        { label: "Average Net", value: salaries.length ? "₱" + Math.round(salaries.reduce((sum, s) => sum + (s.netSalary || 0), 0) / salaries.length).toLocaleString() : "—", color: "from-indigo-500 to-purple-600" },
+        { label: "Highest Net", value: salaries.length ? "₱" + Math.max(...salaries.map(s => s.netSalary || 0)).toLocaleString() : "—", color: "from-emerald-500 to-green-600" },
+        { label: "Latest Pay Date", value: latest ? new Date(latest.payDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "—", color: "from-amber-500 to-orange-600" },
+    ]
+
+    const StatCard = ({ card }) => (
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm p-5 group hover:shadow-md transition-shadow duration-200">
+            <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${card.color} rounded-bl-[3rem] opacity-10 group-hover:opacity-20 transition-opacity`} />
+            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{card.label}</p>
+            <p className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mt-2 truncate">{card.value}</p>
+        </div>
+    )
+
     return (
         <div className="space-y-6">
             {isAdminRoute && (
                 <button
                     type="button"
                     onClick={() => navigate(-1)}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors mb-4"
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-colors"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -102,25 +121,31 @@ const SalaryList = ({ selfService = false }) => {
                 </button>
             )}
 
-            <div className="flex flex-col items-center gap-3 mb-6">
-                <div className="relative">
-                    <div className="w-20 h-20 rounded-full bg-white border-4 border-blue-100 shadow-xl shadow-blue-100 flex items-center justify-center overflow-hidden p-1.5">
+            <div className="relative overflow-hidden rounded-2xl p-6 sm:p-8 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
+                    <img src="/pics/aiics.jpg" alt="" className="w-full h-full object-cover" />
+                </div>
+                <div className="relative z-10 flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur border-2 border-white/40 shadow-xl flex items-center justify-center overflow-hidden p-1 shrink-0">
                         <img
                             src="/pics/aiics.jpg"
                             alt="Company Logo"
                             className="w-full h-full object-contain rounded-full"
                         />
                     </div>
-                    <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border-2 border-white flex items-center justify-center">
-                        <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                    <div>
+                        <p className="text-sm font-medium text-blue-100">{selfService ? 'My Salary' : 'Salary Records'}</p>
+                        <h2 className="text-2xl font-bold mt-1">Salary</h2>
+                        <p className="text-sm text-blue-100 mt-1">View salary history and payslips</p>
                     </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 text-center">
-                    Salary Records
-                </h3>
             </div>
+
+            {!loading && !error && (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    {statCards.map((card) => <StatCard key={card.label} card={card} />)}
+                </div>
+            )}
 
             {loading ? (
                 <div className="flex justify-center py-16">
@@ -130,11 +155,11 @@ const SalaryList = ({ selfService = false }) => {
                     </svg>
                 </div>
             ) : error ? (
-                <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600">
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-xl px-4 py-3 text-sm text-red-600 dark:text-red-400">
                     {error}
                 </div>
             ) : (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
                     <Datatable
                         columns={columns}
                         data={rows}
@@ -144,7 +169,7 @@ const SalaryList = ({ selfService = false }) => {
                         responsive
                         noDataComponent={
                             <div className="py-16 text-center">
-                                <p className="text-sm text-gray-500">No salary records found.</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">No salary records found.</p>
                             </div>
                         }
                         paginationComponentOptions={{
@@ -154,22 +179,22 @@ const SalaryList = ({ selfService = false }) => {
                         customStyles={{
                             headCells: {
                                 style: {
-                                    backgroundColor: "#f1f5f9",
+                                    backgroundColor: isDark ? "#1f2937" : "#f1f5f9",
                                     fontSize: "12px",
                                     fontWeight: "700",
                                     textTransform: "uppercase",
                                     letterSpacing: "0.05em",
-                                    color: "#475569",
+                                    color: isDark ? "#9ca3af" : "#475569",
                                     justifyContent: "center",
                                     paddingLeft: "16px",
                                     paddingRight: "16px",
-                                    borderBottom: "1px solid #e2e8f0",
+                                    borderBottom: isDark ? "1px solid #374151" : "1px solid #e2e8f0",
                                 },
                             },
                             cells: {
                                 style: {
                                     fontSize: "14px",
-                                    color: "#334155",
+                                    color: isDark ? "#d1d5db" : "#334155",
                                     justifyContent: "center",
                                     paddingLeft: "16px",
                                     paddingRight: "16px",
@@ -179,15 +204,15 @@ const SalaryList = ({ selfService = false }) => {
                                 style: {
                                     minHeight: "56px",
                                     "&:hover": {
-                                        backgroundColor: "#f8fafc",
+                                        backgroundColor: isDark ? "#111827" : "#f8fafc",
                                     },
                                 },
                             },
                             pagination: {
                                 style: {
-                                    borderTop: "1px solid #e2e8f0",
+                                    borderTop: isDark ? "1px solid #374151" : "1px solid #e2e8f0",
                                     fontSize: "13px",
-                                    color: "#475569",
+                                    color: isDark ? "#9ca3af" : "#475569",
                                     minHeight: "56px",
                                 },
                             },

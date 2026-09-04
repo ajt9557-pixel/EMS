@@ -10,11 +10,11 @@ const DashboardLayout = ({ sidebar, children }) => {
           <img 
             src="/pics/aiics.jpg" 
             alt="" 
-            className="w-full h-full object-contain mix-blend-multiply opacity-10" 
+             className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-plus-lighter opacity-10 dark:opacity-5"
           />
         </div>
 
-        <div className="relative z-10 min-h-screen bg-white/70 backdrop-blur-sm">
+         <div className="relative z-10 min-h-screen bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm">
           {children}
         </div>
 

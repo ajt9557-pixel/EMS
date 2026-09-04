@@ -10,7 +10,7 @@ const SummaryCard = ({ icon: Icon, text, number, color = "blue" }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 px-4 py-3 flex items-center gap-3">
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3">
       
   
       <div className={`w-10 h-10 rounded-md ${colors[color]} flex items-center justify-center text-white shrink-0`}>
@@ -19,8 +19,8 @@ const SummaryCard = ({ icon: Icon, text, number, color = "blue" }) => {
 
      
       <div className="flex flex-col">
-        <p className="text-xs text-gray-500">{text}</p>
-        <p className="text-2xl font-bold text-gray-800 leading-tight">{number}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{text}</p>
+        <p className="text-2xl font-bold text-gray-800 dark:text-gray-100 leading-tight">{number}</p>
       </div>
 
     </div>

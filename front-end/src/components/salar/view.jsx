@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import axios from 'axios'
 import { API_URL } from '../../utils/api'
 import Datatable from 'react-data-table-component'
+import { useTheme } from '../../context/ThemeContext'
 
 const salaryColumns = [
     {
@@ -50,6 +51,8 @@ const salaryColumns = [
 
 const SalaryView = () => {
     const { id } = useParams()
+    const { theme } = useTheme()
+    const isDark = theme === 'dark'
     const [salaries, setSalaries] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
@@ -88,7 +91,7 @@ const SalaryView = () => {
             <button
                 type="button"
                 onClick={() => window.history.back()}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors mb-4"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-colors mb-4"
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -98,20 +101,20 @@ const SalaryView = () => {
 
             <div className="flex flex-col items-center gap-3 mb-6">
                 <div className="relative">
-                    <div className="w-20 h-20 rounded-full bg-white border-4 border-blue-100 shadow-xl shadow-blue-100 flex items-center justify-center overflow-hidden p-1.5">
+                    <div className="w-20 h-20 rounded-full bg-white dark:bg-gray-800 border-4 border-blue-100 dark:border-blue-800 shadow-xl flex items-center justify-center overflow-hidden p-1.5">
                         <img
                             src="/pics/aiics.jpg"
                             alt="Company Logo"
                             className="w-full h-full object-contain rounded-full"
                         />
                     </div>
-                    <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border-2 border-white flex items-center justify-center">
+                    <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border-2 border-white dark:border-gray-800 flex items-center justify-center">
                         <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 text-center">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center">
                     Salary Records
                 </h3>
             </div>
@@ -124,11 +127,11 @@ const SalaryView = () => {
                     </svg>
                 </div>
             ) : error ? (
-                <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600">
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-xl px-4 py-3 text-sm text-red-600 dark:text-red-400">
                     {error}
                 </div>
             ) : (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
                     <Datatable
                         columns={salaryColumns}
                         data={rows}
@@ -138,7 +141,7 @@ const SalaryView = () => {
                         responsive
                         noDataComponent={
                             <div className="py-16 text-center">
-                                <p className="text-sm text-gray-500">No salary records found.</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">No salary records found.</p>
                             </div>
                         }
                         paginationComponentOptions={{
@@ -148,22 +151,22 @@ const SalaryView = () => {
                         customStyles={{
                             headCells: {
                                 style: {
-                                    backgroundColor: "#f1f5f9",
+                                    backgroundColor: isDark ? "#1f2937" : "#f1f5f9",
                                     fontSize: "12px",
                                     fontWeight: "700",
                                     textTransform: "uppercase",
                                     letterSpacing: "0.05em",
-                                    color: "#475569",
+                                    color: isDark ? "#9ca3af" : "#475569",
                                     justifyContent: "center",
                                     paddingLeft: "16px",
                                     paddingRight: "16px",
-                                    borderBottom: "1px solid #e2e8f0",
+                                    borderBottom: isDark ? "1px solid #374151" : "1px solid #e2e8f0",
                                 },
                             },
                             cells: {
                                 style: {
                                     fontSize: "14px",
-                                    color: "#334155",
+                                    color: isDark ? "#d1d5db" : "#334155",
                                     justifyContent: "center",
                                     paddingLeft: "16px",
                                     paddingRight: "16px",
@@ -173,15 +176,15 @@ const SalaryView = () => {
                                 style: {
                                     minHeight: "56px",
                                     "&:hover": {
-                                        backgroundColor: "#f8fafc",
+                                        backgroundColor: isDark ? "#111827" : "#f8fafc",
                                     },
                                 },
                             },
                             pagination: {
                                 style: {
-                                    borderTop: "1px solid #e2e8f0",
+                                    borderTop: isDark ? "1px solid #374151" : "1px solid #e2e8f0",
                                     fontSize: "13px",
-                                    color: "#475569",
+                                    color: isDark ? "#9ca3af" : "#475569",
                                     minHeight: "56px",
                                 },
                             },
