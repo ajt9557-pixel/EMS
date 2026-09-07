@@ -39,7 +39,6 @@ const SettingsIcon = () => (
 );
 
 const AdminSidebar = () => {
-  // Helper function for NavLink classes
   const linkClasses = ({ isActive }) =>
     `flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
       isActive
@@ -62,15 +61,19 @@ const AdminSidebar = () => {
           <DashboardIcon />
           Dashboard
         </NavLink>
+        <NavLink to="/admin-dashboard/Profile" end className={linkClasses}>
+          <EmployeesIcon />
+          My Profile
+        </NavLink>
         <NavLink to="/admin-dashboard/employee" end className={linkClasses}>
           <EmployeesIcon />
           Employees
         </NavLink>
-        <NavLink to="/admin-dashboard/Department-dashboard" end className={linkClasses}>
+        <NavLink to="/admin-dashboard/department-dashboard" end className={linkClasses}>
           <DepartmentsIcon />
           Departments
         </NavLink>
-        <NavLink to="/admin-dashboard/leaves" end className={linkClasses}>
+        <NavLink to="/admin-dashboard/Leaves" end className={linkClasses}>
           <LeavesIcon />
           Leaves
         </NavLink>
@@ -78,7 +81,7 @@ const AdminSidebar = () => {
           <SalaryIcon />
           Salary
         </NavLink>
-        <NavLink to="/Settings-dashboard" end className={linkClasses}>
+        <NavLink to="/admin-dashboard/Settings" end className={linkClasses}>
           <SettingsIcon />
           Settings
         </NavLink>

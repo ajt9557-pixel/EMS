@@ -2,20 +2,20 @@ import bcrypt from "bcryptjs";
 import User from "../models/User.mjs";
 const changePassword = async (req,res ) => {
     try{
-        const {userID, oldPassword, newPassword} = req.body;
-        const user = await User.findById(userID);
+        const {userId, userID, oldPassword, newPassword} = req.body;
+        const targetId = userId || userID || req.user?._id;
+        const user = await User.findById(targetId);
         if(!user){
             return res.status(404).json({ success: false, error: "User not found" });
         }
+         if (!oldPassword || !newPassword) return res.status(400).json({ success: false, error: "oldPassword and newPassword required" });
+         if (newPassword.length < 6) return res.status(400).json({ success: false, error: "New password must be at least 6 characters" });
          const isMatch = await bcrypt.compare(oldPassword, user.password);
          if(!isMatch){
-            return res.status(404).json({ success: false, error: "Wrong old password" });
-
+            return res.status(400).json({ success: false, error: "Wrong old password" });
          }
         
-         const hashPassword = await bcrypt.hash(newPassword, 10);
-         user.password = hashPassword;
-         await user.save();
+         user.password = newPassword;
          return res.status(200).json({ success: true, message: "Password changed successfully" });
 
     }catch(error){

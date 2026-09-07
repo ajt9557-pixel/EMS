@@ -1,7 +1,6 @@
 import React from 'react'
 
 const SummaryCard = ({ icon: Icon, text, number, color = "blue" }) => {
-  // Map the color prop to a Tailwind background class
   const colors = {
     blue: "bg-blue-500",
     green: "bg-emerald-500",

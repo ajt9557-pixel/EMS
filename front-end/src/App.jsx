@@ -53,6 +53,8 @@ function App() {
           <Route path="Leaves" element={<Table/>} />
           <Route path="leave/:id" element={<LeaveDetails />} />
           <Route path="employee/:id/leaves" element={<EmployeeLeaveHistory />} />
+          <Route path="Profile" element={<MyProfile />} />
+          <Route path="Settings" element={<Settings />} />
         </Route>
 
       <Route path="/employee-dashboard" element={

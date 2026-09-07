@@ -106,7 +106,8 @@ const AddLeave = () => {
                 <option className="dark:bg-gray-700 dark:text-gray-200" value="">Select a Leave type</option>
                 <option className="dark:bg-gray-700 dark:text-gray-200" value="sick">Sick leave</option>
                 <option className="dark:bg-gray-700 dark:text-gray-200" value="casual">Casual leave</option>
-                <option className="dark:bg-gray-700 dark:text-gray-200" value="annual">Annual leave</option>
+                <option className="dark:bg-gray-700 dark:text-gray-200" value="maternity">Maternity leave</option>
+                <option className="dark:bg-gray-700 dark:text-gray-200" value="paternity">Paternity leave</option>
               </select>
             </div>
             <div>

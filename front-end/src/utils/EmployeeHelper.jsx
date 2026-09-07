@@ -205,7 +205,7 @@ export const EmployeeButtons = ({
      
         <button
           type="button"
-         onClick={() => navigate(`/admin-dashboard/employee/leave/${Id}`)}
+          onClick={onLeave}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 border border-purple-100 px-3 py-1.5 rounded-lg transition-colors"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

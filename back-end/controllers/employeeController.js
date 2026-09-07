@@ -1,9 +1,13 @@
 import Employee from "../models/Employee.js";
 import User from "../models/User.mjs";
+import Department from "../models/Department.js";
+import Salary from "../models/Salary.js";
+import Leave from "../models/Leave.js";
 import bcrypt from "bcryptjs";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import crypto from "crypto";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -21,13 +25,23 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + "-" + path.extname(file.originalname));
+        const ext = path.extname(file.originalname).toLowerCase();
+        const id = crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2,8);
+        cb(null, id + ext);
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 2 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        if (/^image\/(jpeg|png|jpg|webp)$/.test(file.mimetype)) cb(null, true);
+        else cb(new Error("Only jpeg, png, jpg, webp images allowed"));
+    }
+});
 
 const addEmployee = async (req, res) => {
+    const uploadedFile = req.file ? path.join(uploadDir, req.file.filename) : null;
     try {
         const {
             name,
@@ -43,44 +57,76 @@ const addEmployee = async (req, res) => {
             salary
         } = req.body;
 
-        const existingUser = await User.findOne({ email });
+        if (!name?.trim() || !email?.trim() || !password?.trim() || !employeeId?.trim() || !department || salary === undefined) {
+            if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
+            return res.status(400).json({ success: false, error: "name, email, password, employeeId, department, salary are required" });
+        }
+        const salaryNum = Number(salary);
+        if (!Number.isFinite(salaryNum) || salaryNum < 0) {
+            if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
+            return res.status(400).json({ success: false, error: "Invalid salary" });
+        }
+        if (department && !/^[0-9a-fA-F]{24}$/.test(department)) {
+            if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
+            return res.status(400).json({ success: false, error: "Invalid department ID" });
+        }
+        const deptExists = await Department.findById(department);
+        if (!deptExists) {
+            if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
+            return res.status(400).json({ success: false, error: "Department not found" });
+        }
+
+        const normalizedEmail = email.toLowerCase().trim();
+        const existingUser = await User.findOne({ email: normalizedEmail });
         if (existingUser) {
+            if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
             return res.status(400).json({ success: false, error: "User already exists" });
         }
 
-        const existingEmployee = await Employee.findOne({ employeeId });
+        const existingEmployee = await Employee.findOne({ employeeId: employeeId.trim() });
         if (existingEmployee) {
+            if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
             return res.status(400).json({ success: false, error: "Employee ID already exists" });
         }
 
-        const hashpassword = await bcrypt.hash(password, 10);
-
         const newUser = new User({
-            name,
-            email,
+            name: name.trim(),
+            email: normalizedEmail,
             profilePicture: req.file ? req.file.filename : "",
-            password: hashpassword,
+            password: password,
             role,
         });
         await newUser.save();
 
-        const newEmployee = new Employee({
-            userId: newUser._id,
-            employeeId,
-            dob,
-            gender,
-            maritalStatus,
-            placeOfBirth,
-            department,
-            salary,
-        });
-        await newEmployee.save();
+        try {
+            const newEmployee = new Employee({
+                userId: newUser._id,
+                employeeId: employeeId.trim(),
+                dob,
+                gender,
+                maritalStatus,
+                placeOfBirth: placeOfBirth?.trim(),
+                department,
+                salary: salaryNum,
+            });
+            await newEmployee.save();
+        } catch (empErr) {
+            await User.findByIdAndDelete(newUser._id);
+            if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
+            throw empErr;
+        }
 
-        res.status(200).json({ success: true, message: "Employee added successfully" });
+        return res.status(201).json({ success: true, message: "Employee added successfully" });
     } catch (error) {
         console.log('ADD EMPLOYEE ERROR:', error);
+        if (uploadedFile && fs.existsSync(uploadedFile)) {
+            try { fs.unlinkSync(uploadedFile); } catch {}
+        }
         if (error.code === 11000) {
             return res.status(400).json({ success: false, error: "Employee ID or email already exists" });
+        }
+        if (error.name === 'ValidationError' || error.name === 'CastError') {
+            return res.status(400).json({ success: false, error: error.message });
         }
         return res.status(500).json({ success: false, error: "add employee server error" });
     }
@@ -142,6 +188,7 @@ const getEmployee = async (req, res) => {
         });
     } catch (error) {
         console.log('GET EMPLOYEE ERROR:', error);
+        if (error.name === 'CastError') return res.status(400).json({ success: false, error: "Invalid employee ID" });
         return res.status(500).json({ success: false, error: "get employee server error" });
     }
 }
@@ -179,9 +226,12 @@ const getMyProfile = async (req, res) => {
 }
 
 const updateEmployee = async (req, res) => {
+    const newFilePath = req.file ? path.join(uploadDir, req.file.filename) : null;
+    let oldPic = null;
     try {
         const employee = await Employee.findById(req.params.id);
         if (!employee) {
+            if (newFilePath && fs.existsSync(newFilePath)) fs.unlinkSync(newFilePath);
             return res.status(404).json({ success: false, error: "Employee not found" });
         }
 
@@ -199,34 +249,74 @@ const updateEmployee = async (req, res) => {
             role
         } = req.body;
 
-        if (employee.userId) {
-            const user = await User.findById(employee.userId);
-            if (user) {
-                if (name !== undefined) user.name = name;
-                if (email !== undefined) user.email = email;
-                if (role !== undefined) user.role = role;
-                if (req.file) user.profilePicture = req.file.filename;
-                if (password && password.trim() !== "") {
-                    user.password = await bcrypt.hash(password, 10);
-                }
-                await user.save();
+        if (email !== undefined) {
+            const norm = String(email).toLowerCase().trim();
+            const dup = await User.findOne({ email: norm, _id: { $ne: employee.userId } });
+            if (dup) {
+                if (newFilePath && fs.existsSync(newFilePath)) fs.unlinkSync(newFilePath);
+                return res.status(400).json({ success: false, error: "Email already exists" });
+            }
+        }
+        if (employeeId !== undefined) {
+            const dupEmp = await Employee.findOne({ employeeId: String(employeeId).trim(), _id: { $ne: employee._id } });
+            if (dupEmp) {
+                if (newFilePath && fs.existsSync(newFilePath)) fs.unlinkSync(newFilePath);
+                return res.status(400).json({ success: false, error: "Employee ID already exists" });
+            }
+        }
+        if (department !== undefined && department !== "" && !/^[0-9a-fA-F]{24}$/.test(department)) {
+            if (newFilePath && fs.existsSync(newFilePath)) fs.unlinkSync(newFilePath);
+            return res.status(400).json({ success: false, error: "Invalid department ID" });
+        }
+        if (salary !== undefined && salary !== "") {
+            const n = Number(salary);
+            if (!Number.isFinite(n) || n < 0) {
+                if (newFilePath && fs.existsSync(newFilePath)) fs.unlinkSync(newFilePath);
+                return res.status(400).json({ success: false, error: "Invalid salary" });
             }
         }
 
-        if (employeeId !== undefined) employee.employeeId = employeeId;
+        if (employee.userId) {
+            const user = await User.findById(employee.userId);
+            if (user) {
+                if (name !== undefined) user.name = String(name).trim();
+                if (email !== undefined) user.email = String(email).toLowerCase().trim();
+                if (role !== undefined) user.role = role;
+                if (req.file) {
+                    oldPic = user.profilePicture;
+                    user.profilePicture = req.file.filename;
+                }
+                if (password && String(password).trim() !== "") {
+                    user.password = String(password).trim();
+                }
+                await user.save();
+                if (oldPic && req.file) {
+                    const oldPath = path.join(uploadDir, oldPic);
+                    try { if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath); } catch {}
+                }
+            }
+        }
+
+        if (employeeId !== undefined && String(employeeId).trim() !== "") employee.employeeId = String(employeeId).trim();
         if (dob !== undefined) employee.dob = dob;
         if (gender !== undefined) employee.gender = gender;
         if (maritalStatus !== undefined) employee.maritalStatus = maritalStatus;
-        if (placeOfBirth !== undefined) employee.placeOfBirth = placeOfBirth;
-        if (department !== undefined) employee.department = department;
-        if (salary !== undefined) employee.salary = salary;
+        if (placeOfBirth !== undefined) employee.placeOfBirth = String(placeOfBirth).trim();
+        if (department !== undefined && department !== "") employee.department = department;
+        if (salary !== undefined && salary !== "") employee.salary = Number(salary);
         await employee.save();
 
         return res.status(200).json({ success: true, message: "Employee updated successfully" });
     } catch (error) {
         console.log('UPDATE EMPLOYEE ERROR:', error);
+        if (newFilePath && fs.existsSync(newFilePath)) {
+            try { fs.unlinkSync(newFilePath); } catch {}
+        }
         if (error.code === 11000) {
             return res.status(400).json({ success: false, error: "Employee ID already exists" });
+        }
+        if (error.name === 'ValidationError' || error.name === 'CastError') {
+            return res.status(400).json({ success: false, error: error.message });
         }
         return res.status(500).json({ success: false, error: "update employee server error" });
     }
@@ -234,16 +324,25 @@ const updateEmployee = async (req, res) => {
 
 const deleteEmployee = async (req, res) => {
     try {
-        const employee = await Employee.findByIdAndDelete(req.params.id);
+        const employee = await Employee.findById(req.params.id);
         if (!employee) {
             return res.status(404).json({ success: false, error: "Employee not found" });
         }
-        if (employee.userId) {
-            await User.findByIdAndDelete(employee.userId);
+        const user = employee.userId ? await User.findById(employee.userId) : null;
+        const pic = user?.profilePicture;
+
+        await Employee.findByIdAndDelete(req.params.id);
+        if (employee.userId) await User.findByIdAndDelete(employee.userId);
+        await Salary.deleteMany({ employeeId: employee._id });
+        await Leave.deleteMany({ employeeId: employee._id });
+        if (pic) {
+            const picPath = path.join(uploadDir, pic);
+            try { if (fs.existsSync(picPath)) fs.unlinkSync(picPath); } catch {}
         }
         return res.status(200).json({ success: true, message: "Employee deleted successfully" });
     } catch (error) {
         console.log('DELETE EMPLOYEE ERROR:', error);
+        if (error.name === 'CastError') return res.status(400).json({ success: false, error: "Invalid employee ID" });
         return res.status(500).json({ success: false, error: "delete employee server error" });
     }
 }
@@ -275,4 +374,39 @@ const deleteEmployee = async (req, res) => {
     }
  }
 
-export { addEmployee, getEmployees, getEmployee, getMyProfile, updateEmployee, deleteEmployee, upload , fetchEmployeesByDepId};
+const updateMyProfilePicture = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, error: "No image file uploaded" });
+        }
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ success: false, error: "User not found" });
+        }
+
+        if (user.profilePicture) {
+            const oldPath = path.join(uploadDir, user.profilePicture);
+            try {
+                if (fs.existsSync(oldPath)) {
+                    fs.unlinkSync(oldPath);
+                }
+            } catch (e) {
+                console.log('OLD PROFILE PICTURE DELETE FAILED:', e.message);
+            }
+        }
+
+        user.profilePicture = req.file.filename;
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile picture updated successfully",
+            profilePicture: user.profilePicture,
+        });
+    } catch (error) {
+        console.log('UPDATE MY PROFILE PICTURE ERROR:', error);
+        return res.status(500).json({ success: false, error: "update profile picture server error" });
+    }
+};
+
+export { addEmployee, getEmployees, getEmployee, getMyProfile, updateEmployee, deleteEmployee, upload , fetchEmployeesByDepId, updateMyProfilePicture};

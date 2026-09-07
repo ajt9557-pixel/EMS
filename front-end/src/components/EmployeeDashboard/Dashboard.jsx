@@ -68,7 +68,7 @@ const Dashboard = () => {
           My Profile
         </NavLink>
         <NavLink to="/employee-dashboard/Leaves" end className={linkClasses}>
-          <DepartmentsIcon />
+          <LeavesIcon />
           Leaves
         </NavLink>
         <NavLink to="/employee-dashboard/salary" end className={linkClasses}>

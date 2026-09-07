@@ -35,7 +35,6 @@ function List() {
     fetchEmployees();
   }, []);
 
-  // ✅ Fixed handleDelete
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this employee?")) return;
     
@@ -47,7 +46,6 @@ function List() {
     } catch (err) {
       alert(err.response?.data?.error || "Failed to delete employee");
     }
-    // ❌ Removed the duplicate if block that was outside try scope
   };
 
   const filtered = employees.filter((emp) =>
