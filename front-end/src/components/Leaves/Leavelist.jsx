@@ -169,12 +169,12 @@ const Leavelist = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
-          <div key={card.label} className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm p-5 group hover:shadow-md transition-shadow duration-200">
-            <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${card.color} rounded-bl-[3rem] opacity-10 group-hover:opacity-20 transition-opacity`} />
-            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{card.label}</p>
-            <p className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-2">{card.value}</p>
+          <div key={card.label} className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm p-4 sm:p-5 group hover:shadow-md transition-shadow duration-200">
+            <div className={`absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br ${card.color} rounded-bl-[3rem] opacity-10 group-hover:opacity-20 transition-opacity`} />
+            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider truncate pr-10">{card.label}</p>
+            <p className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mt-2 truncate">{card.value}</p>
           </div>
         ))}
       </div>
@@ -196,9 +196,10 @@ const Leavelist = () => {
         </div>
       ) : (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700">
             <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Leave History</h4>
           </div>
+          <div className="overflow-x-auto">
           <Datatable
             columns={columns}
             data={rows}
@@ -262,6 +263,7 @@ const Leavelist = () => {
               },
             }}
           />
+          </div>
         </div>
       )}
     </div>

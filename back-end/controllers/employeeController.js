@@ -8,12 +8,9 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
-import { fileURLToPath } from "url";
+import os from "os";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-export const uploadDir = path.join(__dirname, "..", "uploads");
+export const uploadDir = path.join(os.tmpdir(), "uploads");
 try {
     fs.mkdirSync(uploadDir, { recursive: true });
 } catch (err) {

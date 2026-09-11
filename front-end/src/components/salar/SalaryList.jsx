@@ -142,7 +142,7 @@ const SalaryList = ({ selfService = false }) => {
             </div>
 
             {!loading && !error && (
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {statCards.map((card) => <StatCard key={card.label} card={card} />)}
                 </div>
             )}
@@ -160,6 +160,7 @@ const SalaryList = ({ selfService = false }) => {
                 </div>
             ) : (
                 <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
                     <Datatable
                         columns={columns}
                         data={rows}
@@ -218,6 +219,7 @@ const SalaryList = ({ selfService = false }) => {
                             },
                         }}
                     />
+                    </div>
                 </div>
             )}
         </div>

@@ -8,7 +8,6 @@ import {useTheme} from '../context/ThemeContext.jsx'
 const Login = () => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
-  const [remember, setRemember] = React.useState(false)
   const [error, setError] = React.useState(null)
   const [loading, setLoading] = React.useState(false)
   const { login } = useAuth()
@@ -32,11 +31,7 @@ const Login = () => {
       if (response.data.success) {
         login(response.data.user)
 
-        if (remember) {
-          localStorage.setItem('token', response.data.tokken)
-        } else {
-          sessionStorage.setItem('token', response.data.tokken)
-        }
+        localStorage.setItem('token', response.data.tokken)
         if (response.data.user.role === 'admin') {
           navigate('/admin-dashboard')
         } else {
@@ -60,7 +55,7 @@ const Login = () => {
 
       <button
         onClick={toggleTheme}
-        className="fixed top-4 right-4 z-50 p-2.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg ring-1 ring-white/60 dark:ring-gray-700/60 text-gray-600 dark:text-black hover:bg-white dark:hover:bg-gray-700 transition-colors"
+        className="fixed top-4 right-4 z-50 p-2.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg ring-1 ring-white/60 dark:ring-gray-700/60 text-gray-600 dark:text-white hover:bg-white dark:hover:bg-gray-700 transition-colors"
         title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
       >
         {theme === 'light' ? (
@@ -110,23 +105,23 @@ const Login = () => {
 
 
         <div className="text-center space-y-1">
-           <h1 className="text-2xl font-bold tracking-tight dark:text-white" style={{ color: '#1E3A5F' }}>
-            AICS
-          </h1>
-          <p className="text-sm font-medium text-blue-400 tracking-wide">
-            Employee Management System
-          </p>
-        </div>
+            <h1 className="text-2xl font-bold tracking-tight text-[#1E3A5F] dark:text-white">
+             AICS
+           </h1>
+           <p className="text-sm font-medium text-blue-400 dark:text-white tracking-wide">
+             Employee Management System
+           </p>
+         </div>
 
 
-        <div  className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 space-y-6 ring-1 ring-white/60 dark:ring-gray-700/60">
+        <div  className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-8 space-y-6 ring-1 ring-white/60 dark:ring-gray-700/60">
 
           <div className="text-center space-y-1">
-            <h2 className="text-xl font-semibold dark:text-white" style={{ color: '#1E3A5F' }}>
-              Welcome back
-            </h2>
-            <p className="text-xs text-blue-300 dark:text-black">Sign in to continue to your account</p>
-          </div>
+             <h2 className="text-xl font-semibold text-[#1E3A5F] dark:text-white">
+               Welcome back
+             </h2>
+             <p className="text-xs text-blue-300 dark:text-white">Sign in to continue to your account</p>
+           </div>
     
 
           {error && (
@@ -143,7 +138,7 @@ const Login = () => {
 
  
             <div className="space-y-1.5">
-              <label htmlFor="email"  className="block text-sm font-medium text-gray-600 dark:text-black">
+              <label htmlFor="email"  className="block text-sm font-medium text-gray-600 dark:text-white">
                 Email address
               </label>
               <div className="relative">
@@ -158,15 +153,15 @@ const Login = () => {
                   placeholder="you@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                   className="w-full border border-blue-100 bg-blue-50/40 dark:border-gray-600 dark:bg-gray-700/50 dark:text-black dark:placeholder-gray-400 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-500 dark:focus:border-blue-500 focus:border-blue-300 transition-all"
-                  required
-                />
-              </div>
-            </div>
+                   className="w-full border border-blue-100 bg-blue-50/40 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white dark:placeholder-gray-400 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-500 dark:focus:border-blue-500 focus:border-blue-300 transition-all"
+                   required
+                 />
+               </div>
+             </div>
 
 
-            <div className="space-y-1.5">
-              <label htmlFor="password"  className="block text-sm font-medium text-gray-600 dark:text-black" >
+             <div className="space-y-1.5">
+               <label htmlFor="password"  className="block text-sm font-medium text-gray-600 dark:text-white" >
                 Password
               </label>
               <div className="relative">
@@ -181,39 +176,10 @@ const Login = () => {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-blue-100 bg-blue-50/40 dark:border-gray-600 dark:bg-gray-700/50 dark:text-black dark:placeholder-gray-400 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-500 dark:focus:border-blue-500 focus:border-blue-300 transition-all"
+                  className="w-full border border-blue-100 bg-blue-50/40 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white dark:placeholder-gray-400 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-700 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-500 dark:focus:border-blue-500 focus:border-blue-300 transition-all"
                   required
                 />
               </div>
-            </div>
-
-
-            <div className="flex items-center justify-between">
-              <label htmlFor="remember" className="flex items-center gap-2 cursor-pointer group">
-                <div className="relative">
-                  <input
-                    type="checkbox"
-                    id="remember"
-                    checked={remember}
-                    onChange={(e) => setRemember(e.target.checked)}
-                    className="peer sr-only"
-                  />
-                  <div className="w-4.5 h-4.5 w-[18px] h-[18px] rounded-md border-2 border-blue-200 dark:border-gray-600 bg-white dark:bg-gray-700 peer-checked:bg-blue-500 peer-checked:border-blue-500 transition-all flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                    </svg>
-                  </div>
-                </div>
-                <span  className="text-sm text-gray-500 dark:text-black group-hover:text-gray-700 dark:group-hover:text-gray-700 transition-colors">
-                  Remember me
-                </span>
-              </label>
-              <a
-                href="/forgot-password"
-                className="text-sm font-medium text-blue-400 hover:text-blue-600 transition-colors"
-              >
-                Forgot password?
-              </a>
             </div>
 
 
@@ -242,13 +208,13 @@ const Login = () => {
                <div className="w-full border-t border-blue-100 dark:border-gray-700" />
             </div>
             <div className="relative flex justify-center text-xs">
-               <span className="bg-white/80 dark:bg-gray-800/80 px-3 text-blue-300 dark:text-black">POGI NA GAWA NI ALEXIS</span>
+               <span className="bg-white/80 dark:bg-gray-800/80 px-3 text-blue-300 dark:text-white">POGI NA GAWA NI ALEXIS</span>
             </div>
           </div>
         </div>
 
 
-        <p  className="text-xs text-blue-300 dark:text-black text-center">
+        <p  className="text-xs text-blue-300 dark:text-white text-center">
           AICS Employee Management System &copy; {new Date().getFullYear()}
         </p>
       </div>

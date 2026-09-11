@@ -16,15 +16,15 @@ const Navbar = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-700 shadow-sm h-16 flex justify-between items-center px-6">
-      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200">
-        Welcome, <span className="text-blue-600 font-bold">{user?.name}</span>
+    <div className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-700 shadow-sm min-h-16 flex flex-wrap justify-between items-center gap-2 px-4 sm:px-6 py-2 sm:py-0">
+      <h3 className="text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-200 truncate max-w-[60%] sm:max-w-none">
+        Welcome, <span className="text-blue-600 font-bold truncate">{user?.name}</span>
       </h3>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <button 
             onClick={toggleTheme}
-            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
+            className="p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             title={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
           >
             {theme === 'light' ? (
@@ -39,13 +39,13 @@ const Navbar = () => {
           </button>
           <button 
               onClick={handleLogout}
-              className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 px-3 sm:px-4 py-2.5 rounded-xl transition-colors min-h-[44px]"
             >
 
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
               </svg>
-              Logout
+              <span className="hidden xs:inline sm:inline">Logout</span>
             </button>
       </div>
       

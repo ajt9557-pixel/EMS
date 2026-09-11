@@ -39,7 +39,7 @@ const AddLeave = () => {
 
   return (
     <div className="flex justify-center">
-      <div className="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-8">
+      <div className="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-4 sm:p-8">
         <button
           type="button"
           onClick={() => navigate('/employee-dashboard/Leaves')}

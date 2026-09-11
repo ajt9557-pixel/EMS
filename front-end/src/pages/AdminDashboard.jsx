@@ -10,7 +10,7 @@ const AdminDashboard = () => {
   return (
     <DashboardLayout sidebar={<Adminsidebar />}>
       <Navbar />
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <Outlet />
       </div>
     </DashboardLayout>
