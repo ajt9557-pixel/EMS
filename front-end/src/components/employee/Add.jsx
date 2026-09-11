@@ -28,9 +28,15 @@ const Add = () => {
     };
     const handleSubmit = async (e) => {
         e.preventDefault()
-       
+        if (formdata.password !== formdata.confirmPassword) {
+            alert("Passwords do not match");
+            return;
+        }
         const formDataObj = new FormData();
         Object.keys(formdata).forEach((key) => {
+            if (key === "confirmPassword") return;
+            if (key === "image" && !formdata[key]) return;
+            if (formdata[key] === undefined || formdata[key] === null) return;
             formDataObj.append(key, formdata[key]);
         })
         try{
@@ -45,9 +51,9 @@ const Add = () => {
             }
            
         }catch(error){
-            if (error.response && !error.response.data.success) {
-                alert(error.response.data.error);
-              }
+            console.log("ADD EMPLOYEE ERROR:", error.response?.data || error.message);
+            const msg = error.response?.data?.error || error.message || "Failed to add employee";
+            alert(msg);
         }
     }
   return (
@@ -138,14 +144,14 @@ const Add = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1.5">Employee ID</label>
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1.5">Employee ID {formdata.role === 'admin' && <span className="text-gray-400 font-normal">(optional for admin)</span>}</label>
               <input
                 type="text"
                 name="employeeId"
                 onChange={handleChange}
-                placeholder="Employee ID"
+                placeholder={formdata.role === 'admin' ? "Employee ID (optional)" : "Employee ID"}
                 className="w-full border border-blue-100 dark:border-gray-600 bg-blue-50/40 dark:bg-gray-700/50 rounded-xl px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
-                required
+                required={formdata.role !== 'admin'}
               />
             </div>
 
@@ -201,12 +207,12 @@ const Add = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1.5">Department</label>
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1.5">Department {formdata.role === 'admin' && <span className="text-gray-400 font-normal">(optional for admin)</span>}</label>
               <select
                 name="department"
                 onChange={handleChange}
                 className="w-full border border-blue-100 dark:border-gray-600 bg-blue-50/40 dark:bg-gray-700/50 rounded-xl px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
-                required
+                required={formdata.role !== 'admin'}
               >
                 <option className="dark:bg-gray-700 dark:text-gray-200" value="">Select a Department</option>
                 {departments.map((department) => (
@@ -216,7 +222,7 @@ const Add = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1.5">Salary</label>
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1.5">Salary {formdata.role === 'admin' && <span className="text-gray-400 font-normal">(optional)</span>}</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-gray-500">₱</span>
                 <input
@@ -225,7 +231,7 @@ const Add = () => {
                   onChange={handleChange}
                   placeholder="0.00"
                   className="w-full border border-blue-100 dark:border-gray-600 bg-blue-50/40 dark:bg-gray-700/50 rounded-xl pl-8 pr-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all"
-                  required
+                  required={formdata.role !== 'admin'}
                 />
               </div>
             </div>

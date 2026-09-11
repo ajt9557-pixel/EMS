@@ -6,11 +6,23 @@ import { addEmployee, getEmployees, getEmployee, getMyProfile, updateEmployee, d
 
 const router = express.Router();
 
-router.post('/add', authmiddleware, upload.single('image'), addEmployee);
+const handleUpload = (req, res, next) => {
+    upload.single('image')(req, res, (err) => {
+        if (err) {
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                return res.status(400).json({ success: false, error: "Image too large (max 2MB)" });
+            }
+            return res.status(400).json({ success: false, error: err.message || "File upload failed" });
+        }
+        next();
+    });
+};
+
+router.post('/add', authmiddleware, handleUpload, addEmployee);
 router.get('/', authmiddleware, getEmployees);
 router.get('/department/:id', authmiddleware, fetchEmployeesByDepId);
 router.get('/my-profile', authmiddleware, getMyProfile);
-router.put('/my-profile/picture', authmiddleware, upload.single('image'), updateMyProfilePicture);
+router.put('/my-profile/picture', authmiddleware, handleUpload, updateMyProfilePicture);
 
 router.put('/settings/change-password', authmiddleware, async (req, res) => {
     try {
@@ -38,7 +50,7 @@ router.put('/settings/change-password', authmiddleware, async (req, res) => {
 });
 
 router.get('/:id', authmiddleware, getEmployee);
-router.put('/:id', authmiddleware, upload.single('image'), updateEmployee);
+router.put('/:id', authmiddleware, handleUpload, updateEmployee);
 router.delete('/:id', authmiddleware, deleteEmployee);
 
 export default router;

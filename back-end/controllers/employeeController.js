@@ -54,12 +54,27 @@ const addEmployee = async (req, res) => {
             salary
         } = req.body;
 
-        if (!name?.trim() || !email?.trim() || !password?.trim() || !employeeId?.trim() || !department || salary === undefined) {
+        const roleNorm = String(role || "user").toLowerCase().trim();
+        const isAdminCreate = roleNorm === "admin";
+        const willCreateEmployee = !isAdminCreate || !!department || (salary !== undefined && salary !== "" && salary !== null);
+
+        if (!name?.trim() || !email?.trim() || !password?.trim() || (willCreateEmployee && !employeeId?.trim())) {
             if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
-            return res.status(400).json({ success: false, error: "name, email, password, employeeId, department, salary are required" });
+            return res.status(400).json({ success: false, error: willCreateEmployee ? "name, email, password, employeeId are required" : "name, email, password are required" });
         }
-        const salaryNum = Number(salary);
-        if (!Number.isFinite(salaryNum) || salaryNum < 0) {
+        // department/salary required for non-admin; optional for admin
+        if (!isAdminCreate && (!department || salary === undefined || salary === "")) {
+            if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
+            return res.status(400).json({ success: false, error: "department and salary are required for employees" });
+        }
+        let salaryNum = undefined;
+        if (salary !== undefined && salary !== "" && salary !== null) {
+            salaryNum = Number(salary);
+            if (!Number.isFinite(salaryNum) || salaryNum < 0) {
+                if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
+                return res.status(400).json({ success: false, error: "Invalid salary" });
+            }
+        } else if (!isAdminCreate) {
             if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
             return res.status(400).json({ success: false, error: "Invalid salary" });
         }
@@ -67,10 +82,12 @@ const addEmployee = async (req, res) => {
             if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
             return res.status(400).json({ success: false, error: "Invalid department ID" });
         }
-        const deptExists = await Department.findById(department);
-        if (!deptExists) {
-            if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
-            return res.status(400).json({ success: false, error: "Department not found" });
+        if (department) {
+            const deptExists = await Department.findById(department);
+            if (!deptExists) {
+                if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
+                return res.status(400).json({ success: false, error: "Department not found" });
+            }
         }
 
         const normalizedEmail = email.toLowerCase().trim();
@@ -80,10 +97,12 @@ const addEmployee = async (req, res) => {
             return res.status(400).json({ success: false, error: "User already exists" });
         }
 
-        const existingEmployee = await Employee.findOne({ employeeId: employeeId.trim() });
-        if (existingEmployee) {
-            if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
-            return res.status(400).json({ success: false, error: "Employee ID already exists" });
+        if (willCreateEmployee) {
+            const existingEmployee = await Employee.findOne({ employeeId: employeeId.trim() });
+            if (existingEmployee) {
+                if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
+                return res.status(400).json({ success: false, error: "Employee ID already exists" });
+            }
         }
 
         const newUser = new User({
@@ -91,29 +110,47 @@ const addEmployee = async (req, res) => {
             email: normalizedEmail,
             profilePicture: req.file ? req.file.filename : "",
             password: password,
-            role,
+            role: roleNorm,
         });
         await newUser.save();
 
-        try {
-            const newEmployee = new Employee({
-                userId: newUser._id,
-                employeeId: employeeId.trim(),
-                dob,
-                gender,
-                maritalStatus,
-                placeOfBirth: placeOfBirth?.trim(),
-                department,
-                salary: salaryNum,
-            });
-            await newEmployee.save();
-        } catch (empErr) {
-            await User.findByIdAndDelete(newUser._id);
-            if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
-            throw empErr;
+        // For admin without department/salary, skip Employee creation (admin-only account like seed)
+        const shouldCreateEmployee = willCreateEmployee;
+        if (shouldCreateEmployee) {
+            // if admin but missing fields, use defaults to satisfy schema
+            const deptForEmp = department || undefined;
+            let salaryForEmp = salaryNum;
+            if (isAdminCreate && salaryForEmp === undefined) salaryForEmp = 0;
+            if (!deptForEmp) {
+                await User.findByIdAndDelete(newUser._id);
+                if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
+                return res.status(400).json({ success: false, error: "department is required when creating employee record" });
+            }
+            if (salaryForEmp === undefined) {
+                await User.findByIdAndDelete(newUser._id);
+                if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
+                return res.status(400).json({ success: false, error: "salary is required when creating employee record" });
+            }
+            try {
+                const newEmployee = new Employee({
+                    userId: newUser._id,
+                    employeeId: employeeId.trim(),
+                    dob,
+                    gender,
+                    maritalStatus,
+                    placeOfBirth: placeOfBirth?.trim(),
+                    department: deptForEmp,
+                    salary: salaryForEmp,
+                });
+                await newEmployee.save();
+            } catch (empErr) {
+                await User.findByIdAndDelete(newUser._id);
+                if (uploadedFile && fs.existsSync(uploadedFile)) fs.unlinkSync(uploadedFile);
+                throw empErr;
+            }
         }
 
-        return res.status(201).json({ success: true, message: "Employee added successfully" });
+        return res.status(201).json({ success: true, message: isAdminCreate && !shouldCreateEmployee ? "Admin added successfully" : "Employee added successfully" });
     } catch (error) {
         console.log('ADD EMPLOYEE ERROR:', error);
         if (uploadedFile && fs.existsSync(uploadedFile)) {

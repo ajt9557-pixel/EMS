@@ -26,6 +26,18 @@ app.use('/api/salary', salaryRouter);
 app.use('/api/leave', LeaveRouter);
 app.use('/api/settings', settingsRouter);
 
+// Global error handler - ensures JSON with `error` field, never `undefined` alert
+app.use((err, req, res, _next) => {
+    console.log('GLOBAL ERROR:', err.message);
+    if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ success: false, error: "Image too large (max 2MB)" });
+    }
+    if (err.message && /Only jpeg/.test(err.message)) {
+        return res.status(400).json({ success: false, error: err.message });
+    }
+    return res.status(err.status || 500).json({ success: false, error: err.message || "server error" });
+});
+
 
 
 export default app;
