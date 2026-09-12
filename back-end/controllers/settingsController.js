@@ -15,8 +15,9 @@ const changePassword = async (req,res ) => {
             return res.status(400).json({ success: false, error: "Wrong old password" });
          }
         
-         user.password = newPassword;
-         return res.status(200).json({ success: true, message: "Password changed successfully" });
+          user.password = newPassword;
+          await user.save();
+          return res.status(200).json({ success: true, message: "Password changed successfully" });
 
     }catch(error){
         console.log('CHANGE PASSWORD ERROR:', error);

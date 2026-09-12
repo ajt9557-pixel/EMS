@@ -1,0 +1,79 @@
+
+TRIINIDAD, ALEXIS JEFFERSON M. BS3AA 
+- EMPLOYEE MANAGEMENT SYSTEM -
+STEP 1: DEFINE THE PROBLEM
+
+
+Programming Language Declared: JavaScript
+(Node.js / Express - backend, React - frontend, MongoDB - database)
+
+
+1 . FULL PROBLEM SCENARIO
+
+Many small and medium-sized businesses still manage employee
+records, attendance, and account access using manual methods such
+as spreadsheets, paper files, or scattered documents. This
+approach creates several recurring issues records are easy to
+lose or duplicate, only one person can safely edit a file at a
+time, there is no controlled way to separate what regular
+employees can see versus what management can see, and there is no
+secure way to verify who is logging in to view or edit sensitive
+information.
+
+As a company grows past a handful of staff, HR staff and managers
+spend increasing amounts of time manually cross-checking
+spreadsheets, resetting improvised passwords shared over chat, and
+fielding requests from employees who are unsure how to access
+their own information. There is no accountability layer - anyone
+with access to the shared file can view or alter any employee's
+record, whether or not they are authorized to.
+
+
+THE EXACT PROBLEM TO BE SOLVED
+
+This project addresses the lack of a centralized, secure, and
+role-restricted system for managing employee information.
+Specifically, the system must:
+
+  - Provide a single, centralized place to store and manage
+    employee records.
+  - Authenticate users with a login system (email and password)
+    instead of an honor-system shared file.
+  - Distinguish between two types of users - Administrators and
+    Employees - and restrict what each type of user is allowed to
+    view or do (role-based access control).
+  - Protect stored passwords using one-way hashing (bcrypt) rather
+    than storing plain text passwords.
+  - Issue a secure, time-limited session token (JWT) after login
+    so the system can verify a user's identity on every subsequent
+    request without asking them to log in again on every page.
+
+ WHO WILL USE THE SYSTEM AND HOW IT HELPS THEM
+
+
+User Type: Administrator (HR / Manager)
+  Role in the System:
+    Logs in with elevated privileges; can view and manage all
+    employee records from the Admin Dashboard.
+  Real-Life Benefit:
+    Saves time previously spent manually editing shared
+    spreadsheets; gains a single source of truth for staff data.
+
+User Type: Employee (Staff Member)
+  Role in the System:
+    Logs in with standard privileges; can view their own profile
+    information from the Employee Dashboard, but cannot see or
+    edit other employees' records.
+  Real-Life Benefit:
+    Gets a secure, private way to access personal work information
+    without depending on HR for every small lookup.
+
+
+In short, the system replaces an insecure, manually-maintained
+spreadsheet workflow with a centralized web application that
+authenticates every user and enforces role-based boundaries
+automatically - removing both the security risk and the day-to-
+day administrative overhead of the old approach.
+
+
+THANK YOUUUUU :)

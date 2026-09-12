@@ -15,6 +15,10 @@ build
 
 # Runtime uploads
 public/uploads
+back-end/uploads
+
+# Legacy prototype - not the active API (active is back-end/)
+server/
 
 # Logs
 *.log
