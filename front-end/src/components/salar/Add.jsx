@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { fetchDepartments, getEmployees } from "../../utils/EmployeeHelper.jsx";
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { API_URL } from '../../utils/api'
 
 const Add = () => {
     const navigate = useNavigate()
+    const { id: preselectedId } = useParams()
     const [departments, setDepartments] = useState([])
     const [employees, setEmployees] = useState([])
     const [formData, setFormData] = useState({})
@@ -22,6 +23,40 @@ const Add = () => {
         }
         loadDepartments()
     }, [])
+
+    // If navigated via /add-salary/:id, preselect that employee's department & employee
+    useEffect(() => {
+        if (!preselectedId || departments.length === 0) return
+        // preselectedId is mongo _id (24 hex) – we try to fetch employee via api to discover its department
+        const preselect = async () => {
+            const t = localStorage.getItem('token') || sessionStorage.getItem('token')
+            if (!t) return
+            try {
+                const base = API_URL.replace(/\/$/, '')
+                // Try get employee via /api/employee/:id (reusing existing endpoint)
+                const res = await axios.get(`${base}/api/employee/${preselectedId}`, { headers: { authorization: `Bearer ${t}` } })
+                if (res.data?.employee) {
+                    const emp = res.data.employee
+                    // emp.department may be id or object
+                    const deptId = typeof emp.department === 'object' ? emp.department._id : emp.department
+                    if (deptId) {
+                        setFormData(prev => ({ ...prev, department: deptId, employeeId: preselectedId }))
+                        const emps = await getEmployees(deptId)
+                        setEmployees(emps)
+                    } else {
+                        setFormData(prev => ({ ...prev, employeeId: preselectedId }))
+                    }
+                } else {
+                    // fallback: just set employeeId, user can pick department manually
+                    setFormData(prev => ({ ...prev, employeeId: preselectedId }))
+                }
+            } catch (e) {
+                // fallback: just set employeeId
+                setFormData(prev => ({ ...prev, employeeId: preselectedId }))
+            }
+        }
+        preselect()
+    }, [preselectedId, departments])
 
     const handleDepartmentChange = async (e) => {
         const departmentId = e.target.value
@@ -52,7 +87,7 @@ const Add = () => {
             };
             const response = await axios.post(`${base}/api/salary/add`, payload, getAuthHeader())
             if (response.data.success) {
-                navigate('/admin-dashboard/employee')
+                navigate('/admin-dashboard/salary-dashboard')
             } else {
                 alert(response.data.error || "Failed to add salary");
             }
@@ -65,6 +100,16 @@ const Add = () => {
     return (
         <div className="flex justify-center">
             <div className="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-4 sm:p-8">
+                <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-colors mb-4"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                    Back
+                </button>
                 
                    
 

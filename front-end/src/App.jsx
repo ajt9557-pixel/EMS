@@ -44,6 +44,8 @@ function App() {
           <Route path="department-dashboard/:id" element={<EditDepartment />} />
           <Route path="salary-dashboard" element={<SalaryList />} />
           <Route path="salary/:id" element={<SalaryList />} />
+          <Route path="add-salary" element={<AddSalary />} />
+          <Route path="add-salary/:id" element={<AddSalary />} />
           <Route path="view/:id" element={<AddSalary />} />
           <Route path="addSalary/:id" element={<AddSalary />} />
           <Route path="add-employee" element={<Add/>} />
