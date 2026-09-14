@@ -51,7 +51,6 @@ const AuthProvider = ({ children }) => {
     setUser(null)
     localStorage.removeItem('token')
     sessionStorage.removeItem('token')
-    setUser(null)
   }
 
   return (

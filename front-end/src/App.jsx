@@ -12,7 +12,6 @@ import EditDepartment from "./components/department/editDepartment.jsx";
 import Add from "./components/employee/Add.jsx";
 import View from "./components/employee/view.jsx";
 import Edit from "./components/employee/edit.jsx";
-import Salary from "./components/salar/Add.jsx";
 import SalaryList from "./components/salar/SalaryList.jsx";
 import AddSalary from "./components/salar/Add.jsx";
 import Summary from './components/EmployeeDashboard/Summary.jsx';
@@ -43,7 +42,7 @@ function App() {
           <Route path="department-dashboard" element={<DepartmentList />} />
           <Route path="add-department" element={<AddDepartment />} />
           <Route path="department-dashboard/:id" element={<EditDepartment />} />
-          <Route path="salary-dashboard" element={<Salary />} />
+          <Route path="salary-dashboard" element={<SalaryList />} />
           <Route path="salary/:id" element={<SalaryList />} />
           <Route path="view/:id" element={<AddSalary />} />
           <Route path="addSalary/:id" element={<AddSalary />} />

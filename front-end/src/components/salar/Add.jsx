@@ -57,7 +57,7 @@ const Add = () => {
                     <div className="relative">
                         <div className="w-20 h-20 rounded-full bg-white dark:bg-gray-800 border-4 border-blue-100 dark:border-blue-800 shadow-xl flex items-center justify-center overflow-hidden p-1.5">
                             <img
-                                src="/pics/aiics.jpg"
+                                src="/pics/aics.jpg"
                                 alt="Company Logo"
                                 className="w-full h-full object-contain rounded-full"
                             />
