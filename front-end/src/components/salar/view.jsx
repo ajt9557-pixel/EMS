@@ -57,18 +57,29 @@ const SalaryView = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
-    const authHeader = { headers: { authorization: `Bearer ${token}` } }
-
     useEffect(() => {
         const fetchSalaries = async () => {
+            if (!id || id === 'undefined') {
+                setError("Invalid employee ID");
+                setLoading(false);
+                return;
+            }
             try {
-                const response = await axios.get(`${API_URL}/api/salary/${id}`, authHeader)
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                if (!token) {
+                    setError("No authentication token found");
+                    setLoading(false);
+                    return;
+                }
+                const base = API_URL.replace(/\/$/, '');
+                const response = await axios.get(`${base}/api/salary/${id}`, { headers: { authorization: `Bearer ${token}` } });
                 if (response.data.success) {
-                    setSalaries(response.data.salaries)
+                    setSalaries(response.data.salaries || [])
+                } else {
+                    setError(response.data.error || "Failed to load salary records");
                 }
             } catch (err) {
-                setError(err.response?.data?.error || "Failed to load salary records")
+                setError(err.response?.data?.error || err.message || "Failed to load salary records")
             } finally {
                 setLoading(false)
             }

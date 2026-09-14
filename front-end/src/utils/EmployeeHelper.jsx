@@ -16,7 +16,8 @@ export const fetchDepartments = async () => {
   }
 
   try {
-    const response = await axios.get(`${API_URL}/api/department`, {
+    const base = API_URL.replace(/\/$/, '');
+    const response = await axios.get(`${base}/api/department`, {
       headers: { authorization: `Bearer ${token}` },
     });
     
@@ -25,7 +26,7 @@ export const fetchDepartments = async () => {
     }
   } catch (error) {
     const message = error.response?.data?.error || "Failed to fetch departments";
-    alert(message);
+    console.error("fetchDepartments error:", message);
   }
   return departments;
 };
@@ -41,7 +42,8 @@ export const getEmployees = async (id) => {
   }
 
   try {
-    const response = await axios.get(`${API_URL}/api/employee/department/${id}`, {
+    const base = API_URL.replace(/\/$/, '');
+    const response = await axios.get(`${base}/api/employee/department/${id}`, {
       headers: { authorization: `Bearer ${token}` },
     });
     
@@ -50,7 +52,7 @@ export const getEmployees = async (id) => {
     }
   } catch (error) {
     const message = error.response?.data?.error || "Failed to fetch employees";
-    alert(message);
+    console.error("getEmployees error:", message);
   }
   return employees;
 };
@@ -61,7 +63,7 @@ const ProfileAvatar = ({ row }) => {
   const src = row.profilePicture?.startsWith("data:")
     ? row.profilePicture
     : row.profilePicture 
-      ? `${API_URL}/uploads/${row.profilePicture}` 
+      ? `${API_URL.replace(/\/$/, '')}/uploads/${row.profilePicture}` 
       : null;
 
   if (!src || failed) {

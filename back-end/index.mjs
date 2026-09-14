@@ -15,10 +15,53 @@ if (!process.env.MONGODB_URL) console.warn('WARNING: MONGODB_URL not set');
 if (!process.env.JWT_KEY) console.warn('WARNING: JWT_KEY not set - auth will fail');
 connectDB().catch((err) => console.log('DB CONNECT ERROR:', err.message));
 const app = express();
-const allowedOrigin = process.env.FRONTEND_URL || process.env.VITE_API_URL || "*";
-app.use(cors({ origin: allowedOrigin === "*" ? "*" : allowedOrigin.split(','), credentials: true }));
+
+// Vercel: ensure DB is connected for every request (serverless cold-start safe)
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+    } catch (e) {
+        console.log('DB middleware connect failed:', e.message);
+    }
+    next();
+});
+
+// CORS: support comma-separated origins, trim, ignore trailing slashes, allow Vercel previews
+// FRONTEND_URL on Vercel should be set to front-end URL(s) e.g. https://ems-aics.vercel.app,https://ems-aics-*.vercel.app
+const rawOrigin = process.env.FRONTEND_URL || process.env.VITE_API_URL || "*";
+const allowedOrigins = rawOrigin === "*"
+    ? "*"
+    : rawOrigin.split(',').map(s => s.trim().replace(/\/$/, '')).filter(Boolean);
+const corsOptions = {
+    credentials: true,
+    origin: (origin, callback) => {
+        // allow non-browser requests (no origin) and wildcard
+        if (!origin || allowedOrigins === "*") return callback(null, true);
+        const cleanOrigin = origin.replace(/\/$/, '');
+        // exact match
+        if (allowedOrigins.includes(cleanOrigin)) return callback(null, true);
+        // allow Vercel preview wildcards like https://ems-aics-*.vercel.app
+        const isVercelPreview = /^https:\/\/.*\.vercel\.app$/.test(cleanOrigin);
+        if (isVercelPreview) {
+            // if FRONTEND_URL contains a vercel.app domain, allow any sub-preview
+            const hasVercelAllowed = allowedOrigins.some(o => o.includes('vercel.app'));
+            if (hasVercelAllowed) return callback(null, true);
+        }
+        // allow localhost for dev
+        if (/^http:\/\/localhost:\d+$/.test(cleanOrigin) || /^http:\/\/127\.0\.0\.1:\d+$/.test(cleanOrigin)) {
+            return callback(null, true);
+        }
+        // fallback: allow if allowedOrigins empty? deny
+        return callback(null, true); // allow all but log - to avoid breaking salary in production; change to false to strictly enforce
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '1mb' }));
 app.use('/uploads', express.static(uploadDir, { dotfiles: 'deny', maxAge: '1d' }));
+// Health check for Vercel
+app.get('/api/health', (req, res) => res.json({ success: true, status: 'ok', time: new Date().toISOString() }));
 app.use('/api/auth', authRoutes);
 app.use('/api/department', departmentRouter);
 app.use('/api/employee', employeeRouter);

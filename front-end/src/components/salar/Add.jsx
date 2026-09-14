@@ -10,8 +10,10 @@ const Add = () => {
     const [employees, setEmployees] = useState([])
     const [formData, setFormData] = useState({})
 
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
-    const authHeader = { headers: { authorization: `Bearer ${token}` } }
+    const getAuthHeader = () => {
+        const t = localStorage.getItem('token') || sessionStorage.getItem('token');
+        return { headers: { authorization: `Bearer ${t}` } };
+    };
 
     useEffect(() => {
         const loadDepartments = async () => {
@@ -35,15 +37,28 @@ const Add = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        // Validate required fields client-side to avoid Vercel 400 with unclear error
+        if (!formData.employeeId) return alert("Please select an employee");
+        if (formData.basicSalary === undefined || formData.basicSalary === "") return alert("Basic salary is required");
+        if (!formData.payDate) return alert("Pay date is required");
         try {
-            const response = await axios.post(`${API_URL}/api/salary/add`, formData, authHeader)
+            const base = API_URL.replace(/\/$/, '');
+            const payload = {
+                employeeId: formData.employeeId,
+                basicSalary: formData.basicSalary,
+                allowances: formData.allowances || 0,
+                deductions: formData.deductions || 0,
+                payDate: formData.payDate,
+            };
+            const response = await axios.post(`${base}/api/salary/add`, payload, getAuthHeader())
             if (response.data.success) {
                 navigate('/admin-dashboard/employee')
+            } else {
+                alert(response.data.error || "Failed to add salary");
             }
         } catch (error) {
-            if (error.response && !error.response.data.success) {
-                alert(error.response.data.error);
-            }
+            const msg = error.response?.data?.error || error.message || "Failed to add salary";
+            alert(msg);
         }
     }
 

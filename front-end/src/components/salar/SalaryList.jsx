@@ -5,7 +5,7 @@ import { API_URL } from '../../utils/api'
 import Datatable from 'react-data-table-component'
 import { useTheme } from '../../context/ThemeContext'
 
-const columns = [
+const baseColumns = [
     {
         name: "SNo.",
         selector: row => row.sno,
@@ -60,29 +60,55 @@ const SalaryList = ({ selfService = false }) => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
-    const authHeader = { headers: { authorization: `Bearer ${token}` } }
-    const endpoint = selfService ? `${API_URL}/api/salary/my` : `${API_URL}/api/salary/${id}`
+    // Resolve endpoint: selfService -> /my , with id -> /:id , without id (salary-dashboard) -> / (all)
+    const getEndpoint = () => {
+        const base = API_URL.replace(/\/$/, '');
+        if (selfService) return `${base}/api/salary/my`;
+        if (id) return `${base}/api/salary/${id}`;
+        return `${base}/api/salary`;
+    };
+    const endpoint = getEndpoint();
 
     useEffect(() => {
         const fetchSalaries = async () => {
+            setLoading(true);
+            setError(null);
             try {
-                const response = await axios.get(endpoint, authHeader)
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                if (!token) {
+                    setError("No authentication token found");
+                    return;
+                }
+                const response = await axios.get(endpoint, { headers: { authorization: `Bearer ${token}` } });
                 if (response.data.success) {
-                    setSalaries(response.data.salaries)
+                    setSalaries(response.data.salaries || []);
+                } else {
+                    setError(response.data.error || "Failed to load salaries");
                 }
             } catch (err) {
-                setError(err.response?.data?.error || "Failed to load salaries")
+                setError(err.response?.data?.error || err.message || "Failed to load salaries");
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
-        }
-        fetchSalaries()
-    }, [id, endpoint, selfService])
+        };
+        fetchSalaries();
+    }, [id, selfService, endpoint])
+
+    // When showing all salaries (no id, not selfService) also show employee columns
+    const isAllView = !selfService && !id;
+    const columns = isAllView ? [
+        baseColumns[0],
+        { name: "Employee", selector: row => row.employeeName || row.employeeId || "-", sortable: true, center: true, cell: row => row.employeeName ? `${row.employeeName} (${row.employeeId || ''})` : (row.employeeId || "-") },
+        { name: "Department", selector: row => row.department || "-", sortable: true, center: true },
+        ...baseColumns.slice(1)
+    ] : baseColumns;
 
     const rows = salaries.map((s, index) => ({
         _id: s._id,
         sno: index + 1,
+        employeeId: s.employeeId,
+        employeeName: s.employeeName,
+        department: s.department,
         basicSalary: s.basicSalary,
         allowances: s.allowances,
         deductions: s.deductions,
