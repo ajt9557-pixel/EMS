@@ -10,7 +10,7 @@ const AttendanceSchema = new Schema(
     checkOut: { type: Date, default: null },
     status: {
       type: String,
-      enum: ["present", "late", "absent", "on-leave", "half-day"],
+      enum: ["present", "late", "absent", "on-leave", "half-day", "excused"],
       default: "present",
     },
     workHours: { type: Number, default: 0 }, // computed on checkOut

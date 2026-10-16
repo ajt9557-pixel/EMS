@@ -172,8 +172,9 @@ const getAllAttendance = async (req, res) => {
     const present = records.filter(r => r.status === "present").length;
     const late = records.filter(r => r.status === "late").length;
     const absent = records.filter(r => r.status === "absent").length;
+    const excused = records.filter(r => r.status === "excused").length;
 
-    return res.status(200).json({ success: true, records, summary: { total, present, late, absent } });
+    return res.status(200).json({ success: true, records, summary: { total, present, late, absent, excused } });
   } catch (error) {
     console.log("GET ALL ATTENDANCE ERROR:", error);
     return res.status(500).json({ success: false, error: "get all attendance server error" });
@@ -239,7 +240,7 @@ const markAttendanceAdmin = async (req, res) => {
         userId: emp.userId,
         title: "Attendance updated",
         message: `Your attendance for ${normDate.toDateString()} marked as ${status}`,
-        variant: status === "late" ? "warning" : status === "absent" ? "error" : "success",
+        variant: status === "late" ? "warning" : status === "absent" ? "error" : status === "excused" || status === "on-leave" ? "info" : "success",
         link: "/employee-dashboard/attendance",
         relatedId: rec._id,
       });

@@ -8,12 +8,13 @@ const statusColors = {
   present: "text-emerald-700 bg-emerald-50 border border-emerald-200 dark:text-emerald-400 dark:bg-emerald-900/20 dark:border-emerald-800/40",
   late: "text-amber-700 bg-amber-50 border border-amber-200 dark:text-amber-400 dark:bg-amber-900/20 dark:border-amber-800/40",
   absent: "text-red-700 bg-red-50 border border-red-200 dark:text-red-400 dark:bg-red-900/20 dark:border-red-800/40",
+  excused: "text-sky-700 bg-sky-50 border border-sky-200 dark:text-sky-400 dark:bg-sky-900/20 dark:border-sky-800/40",
   "on-leave": "text-blue-700 bg-blue-50 border border-blue-200 dark:text-blue-400 dark:bg-blue-900/20 dark:border-blue-800/40",
   "half-day": "text-purple-700 bg-purple-50 border border-purple-200 dark:text-purple-400 dark:bg-purple-900/20 dark:border-purple-800/40",
 }
 
 const StatusDot = ({ status }) => {
-  const colors = { present: "bg-emerald-500", late: "bg-amber-500", absent: "bg-red-500", "on-leave": "bg-blue-500", "half-day": "bg-purple-500" }
+  const colors = { present: "bg-emerald-500", late: "bg-amber-500", absent: "bg-red-500", excused: "bg-sky-500", "on-leave": "bg-blue-500", "half-day": "bg-purple-500" }
   return <span className={`inline-block w-2 h-2 rounded-full ${colors[status] || 'bg-gray-400'}`} />
 }
 
@@ -78,6 +79,7 @@ const AttendanceEmployee = () => {
     present: records.filter(r => r.status === 'present').length,
     late: records.filter(r => r.status === 'late').length,
     absent: records.filter(r => r.status === 'absent').length,
+    excused: records.filter(r => r.status === 'excused').length,
   }
 
   const canCheckIn = !todayRecord?.checkIn
@@ -114,6 +116,7 @@ const AttendanceEmployee = () => {
     { key: "present", label: "Present", count: stats.present },
     { key: "late", label: "Late", count: stats.late },
     { key: "absent", label: "Absent", count: stats.absent },
+    { key: "excused", label: "Excused", count: stats.excused },
   ]
 
   return (
@@ -154,7 +157,7 @@ const AttendanceEmployee = () => {
           {todayRecord?.workHours > 0 && <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">Work hours today: <span className="font-bold text-gray-800 dark:text-gray-200">{todayRecord.workHours}h</span></p>}
         </div>
         <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white flex flex-col justify-between">
-          <div><p className="text-sm opacity-80">This Month</p><p className="text-3xl font-bold mt-2">{stats.present + stats.late} present</p><p className="text-sm opacity-70 mt-1">{stats.late} late • {stats.absent} absent • {stats.total} records</p></div>
+          <div><p className="text-sm opacity-80">This Month</p><p className="text-3xl font-bold mt-2">{stats.present + stats.late} present</p><p className="text-sm opacity-70 mt-1">{stats.late} late • {stats.absent} absent • {stats.excused} excused • {stats.total} records</p></div>
           <div className="mt-6 flex gap-2">
             {filterBtns.slice(1).map(b => (
               <div key={b.key} className="flex-1 bg-white/20 backdrop-blur rounded-xl p-3 text-center"><p className="text-lg font-bold">{b.count}</p><p className="text-xs opacity-80">{b.label}</p></div>

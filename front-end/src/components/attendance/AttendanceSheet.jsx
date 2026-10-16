@@ -7,6 +7,7 @@ const CODE = {
   present: 'P',
   late: 'L',
   absent: 'A',
+  excused: 'E',
   'on-leave': 'LV',
   'half-day': 'HD',
 }
@@ -15,6 +16,7 @@ const CELL_STYLE = {
   present: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400',
   late: 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400',
   absent: 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
+  excused: 'bg-sky-50 text-sky-700 dark:bg-sky-900/20 dark:text-sky-400',
   'on-leave': 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
   'half-day': 'bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400',
 }
@@ -135,7 +137,7 @@ const AttendanceSheet = ({ selfOnly = false }) => {
     return filteredEmployees.map((emp) => {
       const empKey = String(emp._id)
       const byDay = recordMap[empKey] || {}
-      let present = 0, late = 0, absent = 0, leave = 0, half = 0, hours = 0
+      let present = 0, late = 0, absent = 0, excused = 0, leave = 0, half = 0, hours = 0
       const cells = days.map((d) => {
         const key = `${month}-${String(d).padStart(2, '0')}`
         const rec = byDay[key]
@@ -144,13 +146,14 @@ const AttendanceSheet = ({ selfOnly = false }) => {
         if (rec.status === 'present') present++
         else if (rec.status === 'late') late++
         else if (rec.status === 'absent') absent++
+        else if (rec.status === 'excused') excused++
         else if (rec.status === 'on-leave') leave++
         else if (rec.status === 'half-day') half++
         return { day: d, status: rec.status, rec }
       })
-      const totalMarked = present + late + absent + leave + half
+      const totalMarked = present + late + absent + excused + leave + half
       const attendancePct = daysInMonth ? Math.round(((present + late + half * 0.5) / daysInMonth) * 100) : 0
-      return { emp, cells, present, late, absent, leave, half, hours: +hours.toFixed(2), totalMarked, attendancePct }
+      return { emp, cells, present, late, absent, excused, leave, half, hours: +hours.toFixed(2), totalMarked, attendancePct }
     })
   }, [filteredEmployees, recordMap, days, month, daysInMonth])
 
@@ -159,6 +162,7 @@ const AttendanceSheet = ({ selfOnly = false }) => {
     present: rows.reduce((s, r) => s + r.present, 0),
     late: rows.reduce((s, r) => s + r.late, 0),
     absent: rows.reduce((s, r) => s + r.absent, 0),
+    excused: rows.reduce((s, r) => s + (r.excused || 0), 0),
   }), [rows])
 
   const isWeekend = (d) => {
@@ -174,7 +178,7 @@ const AttendanceSheet = ({ selfOnly = false }) => {
   const handlePrint = () => window.print()
 
   const handleCSV = () => {
-    const header = ['Employee ID', 'Name', 'Department', ...days.map((d) => String(d)), 'P', 'L', 'A', 'LV', 'HD', 'Hours', 'Present%']
+    const header = ['Employee ID', 'Name', 'Department', ...days.map((d) => String(d)), 'P', 'L', 'A', 'E', 'LV', 'HD', 'Hours', 'Present%']
     const lines = [header.join(',')]
     for (const r of rows) {
       const dayVals = r.cells.map((c) => (c.status ? CODE[c.status] || c.status : '-'))
@@ -183,7 +187,7 @@ const AttendanceSheet = ({ selfOnly = false }) => {
         `"${(r.emp.name || '').replace(/"/g, '""')}"`,
         `"${(r.emp.dep_name || '').replace(/"/g, '""')}"`,
         ...dayVals,
-        r.present, r.late, r.absent, r.leave, r.half, r.hours, `${r.attendancePct}%`,
+        r.present, r.late, r.absent, (r.excused || 0), r.leave, r.half, r.hours, `${r.attendancePct}%`,
       ]
       lines.push(line.join(','))
     }
@@ -219,7 +223,7 @@ const AttendanceSheet = ({ selfOnly = false }) => {
             <p className="text-sm font-medium text-blue-100">{selfOnly ? 'My Attendance Sheet' : 'Employee Attendance Sheet'}</p>
             <h2 className="text-2xl font-bold mt-1">{monthLabel}</h2>
             <p className="text-sm text-blue-100 mt-1">
-              {selfOnly ? 'Your month-view punch record with totals' : `${totals.employees} employees • ${totals.present} present • ${totals.late} late • ${totals.absent} absent marks`}
+              {selfOnly ? 'Your month-view punch record with totals' : `${totals.employees} employees • ${totals.present} present • ${totals.late} late • ${totals.absent} absent • ${totals.excused} excused marks`}
             </p>
           </div>
           <div className="flex flex-wrap gap-3 items-center">
@@ -260,7 +264,7 @@ const AttendanceSheet = ({ selfOnly = false }) => {
 
       {/* Legend */}
       <div className="flex flex-wrap gap-2 text-xs font-semibold no-print">
-        {[['P', 'Present', 'bg-emerald-100 text-emerald-700'], ['L', 'Late', 'bg-amber-100 text-amber-700'], ['A', 'Absent', 'bg-red-100 text-red-600'], ['LV', 'On Leave', 'bg-blue-100 text-blue-700'], ['HD', 'Half Day', 'bg-purple-100 text-purple-700'], ['-', 'No record', 'bg-gray-100 text-gray-400']].map(([code, label, cls]) => (
+        {[['P', 'Present', 'bg-emerald-100 text-emerald-700'], ['L', 'Late', 'bg-amber-100 text-amber-700'], ['A', 'Absent', 'bg-red-100 text-red-600'], ['E', 'Excused', 'bg-sky-100 text-sky-700'], ['LV', 'On Leave', 'bg-blue-100 text-blue-700'], ['HD', 'Half Day', 'bg-purple-100 text-purple-700'], ['-', 'No record', 'bg-gray-100 text-gray-400']].map(([code, label, cls]) => (
           <span key={code} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${cls}`}><span className="font-bold">{code}</span> {label}</span>
         ))}
       </div>
@@ -282,7 +286,7 @@ const AttendanceSheet = ({ selfOnly = false }) => {
           {/* Print-only title */}
           <div className="hidden print:block px-6 pt-6 pb-2 text-center" style={{ display: 'none' }}>
             <h1 className="text-lg font-bold">Employee Attendance Sheet — {monthLabel}</h1>
-            <p className="text-xs text-gray-500">Generated {new Date().toLocaleString()} • P=Present L=Late A=Absent LV=Leave HD=Half-day -=No record</p>
+            <p className="text-xs text-gray-500">Generated {new Date().toLocaleString()} • P=Present L=Late A=Absent E=Excused LV=Leave HD=Half-day -=No record</p>
           </div>
           <div className="px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between print:border-gray-300">
             <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Attendance Sheet — {monthLabel}</h4>
@@ -302,6 +306,7 @@ const AttendanceSheet = ({ selfOnly = false }) => {
                   <th className="px-2 py-3 text-[11px] font-bold uppercase text-emerald-600 border-b border-l">P</th>
                   <th className="px-2 py-3 text-[11px] font-bold uppercase text-amber-600 border-b">L</th>
                   <th className="px-2 py-3 text-[11px] font-bold uppercase text-red-500 border-b">A</th>
+                  <th className="px-2 py-3 text-[11px] font-bold uppercase text-sky-600 border-b">E</th>
                   <th className="px-2 py-3 text-[11px] font-bold uppercase text-blue-600 border-b">LV</th>
                   <th className="px-2 py-3 text-[11px] font-bold uppercase text-purple-600 border-b">HD</th>
                   <th className="px-2 py-3 text-[11px] font-bold uppercase text-gray-500 border-b">Hrs</th>
@@ -309,7 +314,7 @@ const AttendanceSheet = ({ selfOnly = false }) => {
                 </tr>
               </thead>
               <tbody>
-                {rows.map(({ emp, cells, present, late, absent, leave, half, hours, attendancePct }) => (
+                {rows.map(({ emp, cells, present, late, absent, excused, leave, half, hours, attendancePct }) => (
                   <tr key={emp._id} className="border-b border-gray-50 dark:border-gray-700/50 hover:bg-slate-50/60 dark:hover:bg-gray-700/20">
                     <td className="sticky left-0 z-10 px-4 py-2.5 text-left border-r" style={{ background: isDark ? '#1f2937' : '#fff', minWidth: 200 }}>
                       <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{emp.name || 'Unknown'}</p>
@@ -327,6 +332,7 @@ const AttendanceSheet = ({ selfOnly = false }) => {
                     <td className="px-2 py-2 text-xs font-bold text-emerald-600 border-l">{present}</td>
                     <td className="px-2 py-2 text-xs font-bold text-amber-600">{late}</td>
                     <td className="px-2 py-2 text-xs font-bold text-red-500">{absent}</td>
+                    <td className="px-2 py-2 text-xs font-bold text-sky-600">{excused || 0}</td>
                     <td className="px-2 py-2 text-xs font-bold text-blue-600">{leave}</td>
                     <td className="px-2 py-2 text-xs font-bold text-purple-600">{half}</td>
                     <td className="px-2 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300">{hours || '—'}</td>
@@ -337,7 +343,7 @@ const AttendanceSheet = ({ selfOnly = false }) => {
             </table>
           </div>
           <div className="px-4 sm:px-6 py-3 border-t border-gray-100 dark:border-gray-700 text-[11px] text-gray-400 flex flex-wrap gap-x-4 gap-y-1">
-            <span>P=Present</span><span>L=Late (after 09:15)</span><span>A=Absent</span><span>LV=On Leave</span><span>HD=Half Day</span><span>-=No record</span>
+            <span>P=Present</span><span>L=Late (after 09:15)</span><span>A=Absent</span><span>E=Excused</span><span>LV=On Leave</span><span>HD=Half Day</span><span>-=No record</span>
             <span className="ml-auto">%= (P + L + HD×0.5) ÷ days in month</span>
           </div>
         </div>

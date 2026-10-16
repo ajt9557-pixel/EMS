@@ -10,11 +10,20 @@ const statusColors = {
   absent: "text-red-700 bg-red-50 border border-red-200 dark:text-red-400 dark:bg-red-900/20 dark:border-red-800/40",
   "on-leave": "text-blue-700 bg-blue-50 border border-blue-200 dark:text-blue-400 dark:bg-blue-900/20",
   "half-day": "text-purple-700 bg-purple-50 border border-purple-200 dark:text-purple-400 dark:bg-purple-900/20",
+  excused: "text-sky-700 bg-sky-50 border border-sky-200 dark:text-sky-400 dark:bg-sky-900/20 dark:border-sky-800/40",
 }
 const StatusDot = ({ status }) => {
-  const colors = { present: "bg-emerald-500", late: "bg-amber-500", absent: "bg-red-500", "on-leave": "bg-blue-500", "half-day": "bg-purple-500" }
+  const colors = { present: "bg-emerald-500", late: "bg-amber-500", absent: "bg-red-500", "on-leave": "bg-blue-500", "half-day": "bg-purple-500", excused: "bg-sky-500" }
   return <span className={`inline-block w-2 h-2 rounded-full ${colors[status] || 'bg-gray-400'}`} />
 }
+
+// roster quick-mark buttons (admin taps one per employee for the chosen date)
+const ROSTER_BTNS = [
+  { key: "present", label: "Present", on: "bg-emerald-500 text-white border-emerald-500 shadow", off: "text-emerald-700 border-emerald-200 hover:bg-emerald-50 dark:text-emerald-400 dark:border-emerald-800/50 dark:hover:bg-emerald-900/20" },
+  { key: "late", label: "Late", on: "bg-amber-500 text-white border-amber-500 shadow", off: "text-amber-700 border-amber-200 hover:bg-amber-50 dark:text-amber-400 dark:border-amber-800/50 dark:hover:bg-amber-900/20" },
+  { key: "absent", label: "Absent", on: "bg-red-500 text-white border-red-500 shadow", off: "text-red-700 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800/50 dark:hover:bg-red-900/20" },
+  { key: "excused", label: "Excused", on: "bg-sky-500 text-white border-sky-500 shadow", off: "text-sky-700 border-sky-200 hover:bg-sky-50 dark:text-sky-400 dark:border-sky-800/50 dark:hover:bg-sky-900/20" },
+]
 
 // Local "YYYY-MM-DD" — never toISOString() (UTC day shift in UTC+ zones)
 const toDateStr = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -43,7 +52,8 @@ const AttendanceAdmin = () => {
   const [filter, setFilter] = useState("")
   const [dateFilter, setDateFilter] = useState(todayStr())
   const [monthFilter, setMonthFilter] = useState("")
-  const [summary, setSummary] = useState({ total: 0, present: 0, late: 0, absent: 0 })
+  const [summary, setSummary] = useState({ total: 0, present: 0, late: 0, absent: 0, excused: 0 })
+  const [markingKey, setMarkingKey] = useState(null)
   // admin mark form
   const [showMark, setShowMark] = useState(false)
   const [markForm, setMarkForm] = useState({ employeeId: "", date: todayStr(), status: "present", note: "" })
@@ -55,9 +65,9 @@ const AttendanceAdmin = () => {
     return { headers: { authorization: `Bearer ${t}` } }
   }
 
-  const fetchAll = async () => {
+  const fetchAll = async (quiet = false) => {
     try {
-      setLoading(true)
+      if (!quiet) setLoading(true)
       setError(null)
       const authHeader = getAuthHeader()
       const params = new URLSearchParams()
@@ -78,7 +88,8 @@ const AttendanceAdmin = () => {
           status: r.status,
           raw: r,
         }))
-        setRecords(data); setFiltered(data); setSummary(res.data.summary || { total: data.length, present: data.filter(d => d.status === 'present').length, late: data.filter(d => d.status === 'late').length, absent: data.filter(d => d.status === 'absent').length })
+        const fallback = { total: data.length, present: data.filter(d => d.status === 'present').length, late: data.filter(d => d.status === 'late').length, absent: data.filter(d => d.status === 'absent').length, excused: data.filter(d => d.status === 'excused').length }
+        setRecords(data); setFiltered(data); setSummary({ ...fallback, ...(res.data.summary || {}) })
       }
     } catch (e) { setError(e.response?.data?.error || "Failed to load") }
     finally { setLoading(false) }
@@ -117,6 +128,27 @@ const AttendanceAdmin = () => {
     try { await axios.delete(`${API_URL}/api/attendance/${id}`, getAuthHeader()); fetchAll() } catch (err) { console.log("DELETE FAILED:", err?.response?.data || err.message); alert(err.response?.data?.error || "Delete failed") }
   }
 
+  // roster: employeeId -> status for the selected date (date-mode only)
+  const rosterMap = {}
+  if (dateFilter && !monthFilter) {
+    for (const r of records) {
+      const e = r.raw?.employeeId
+      const k = e && typeof e === 'object' ? String(e._id || '') : String(e || '')
+      if (k && !rosterMap[k]) rosterMap[k] = r.status
+    }
+  }
+  const roster = [...employees].sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+
+  const handleRosterMark = async (empId, status) => {
+    const key = `${empId}:${status}`
+    setMarkingKey(key)
+    try {
+      await axios.post(`${API_URL}/api/attendance/mark`, { employeeId: empId, date: dateFilter, status }, getAuthHeader())
+      await fetchAll(true)
+    } catch (err) { console.log("ROSTER MARK FAILED:", err?.response?.data || err.message); alert(err.response?.data?.error || "Mark failed") }
+    finally { setMarkingKey(null) }
+  }
+
   const columns = [
     { name: "Employee", selector: row => row.name, sortable: true, cell: row => <ProfileCell row={row} />, grow: 1.5 },
     { name: "Date", selector: row => row.date, sortable: true, center: true, cell: row => <span className="text-sm font-medium">{new Date(row.date).toLocaleDateString()}</span> },
@@ -132,6 +164,7 @@ const AttendanceAdmin = () => {
     { label: "Present", value: summary.present, color: "from-emerald-500 to-green-600" },
     { label: "Late", value: summary.late, color: "from-amber-500 to-orange-500" },
     { label: "Absent", value: summary.absent, color: "from-red-500 to-rose-600" },
+    { label: "Excused", value: summary.excused || 0, color: "from-sky-500 to-cyan-600" },
   ]
 
   const filterBtns = [
@@ -139,6 +172,7 @@ const AttendanceAdmin = () => {
     { key: "present", label: "Present", count: summary.present },
     { key: "late", label: "Late", count: summary.late },
     { key: "absent", label: "Absent", count: summary.absent },
+    { key: "excused", label: "Excused", count: summary.excused || 0 },
   ]
 
   return (
@@ -167,7 +201,7 @@ const AttendanceAdmin = () => {
       {showMark && (
         <form onSubmit={handleMark} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 space-y-4">
           <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">Mark / Correct Attendance (Admin)</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div><label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Employee</label>
               <select required value={markForm.employeeId} onChange={e => setMarkForm({ ...markForm, employeeId: e.target.value })} className="mt-1 w-full border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700">
                 <option value="">Select employee</option>{employees.map(emp => <option key={emp._id} value={emp._id}>{emp.name} — {emp.employeeId}</option>)}
@@ -176,7 +210,7 @@ const AttendanceAdmin = () => {
             <div><label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Date</label><input type="date" required value={markForm.date} onChange={e => setMarkForm({ ...markForm, date: e.target.value })} className="mt-1 w-full border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700" /></div>
             <div><label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Status</label>
               <select value={markForm.status} onChange={e => setMarkForm({ ...markForm, status: e.target.value })} className="mt-1 w-full border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700">
-                <option value="present">Present</option><option value="late">Late</option><option value="absent">Absent</option><option value="on-leave">On Leave</option><option value="half-day">Half Day</option>
+                <option value="present">Present</option><option value="late">Late</option><option value="absent">Absent</option><option value="excused">Excused</option><option value="on-leave">On Leave</option><option value="half-day">Half Day</option>
               </select>
             </div>
             <div><label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Note</label><input type="text" placeholder="Optional" value={markForm.note} onChange={e => setMarkForm({ ...markForm, note: e.target.value })} className="mt-1 w-full border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700" /></div>
@@ -196,6 +230,55 @@ const AttendanceAdmin = () => {
           <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           <input type="text" placeholder="Search name or dept..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-10 pr-4 border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 rounded-xl py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
         </div>
+      </div>
+
+      {/* Roster: ordered employee list with Present / Late / Absent / Excused buttons for the chosen date */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex flex-wrap items-center justify-between gap-2">
+          <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+            Take Attendance — {dateFilter && !monthFilter ? new Date(dateFilter + "T00:00:00").toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Select a single date'}
+          </h4>
+          <span className="text-xs text-gray-400">{dateFilter && !monthFilter ? `${roster.length} employees • ${Object.keys(rosterMap).length} marked` : 'Pick a date (clear Month) to mark the roster'}</span>
+        </div>
+        {!(dateFilter && !monthFilter) ? (
+          <p className="px-6 py-8 text-sm text-gray-500 text-center">Roster marking works for one day at a time — clear the Month filter above.</p>
+        ) : roster.length === 0 ? (
+          <p className="px-6 py-8 text-sm text-gray-500 text-center">No employees found.</p>
+        ) : (
+          <ul className="divide-y divide-gray-100 dark:divide-gray-700/50 max-h-[420px] overflow-y-auto">
+            {roster.map(emp => {
+              const cur = rosterMap[String(emp._id)]
+              const dep = emp.dep_name || emp.department?.dep_name || ''
+              return (
+                <li key={emp._id} className="px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">{emp.name?.charAt(0).toUpperCase() || '?'}</div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{emp.name || 'Unknown'}</p>
+                      <p className="text-[11px] text-gray-400 truncate">{emp.employeeId || ''}{dep ? ` • ${dep}` : ''}{cur ? ` • ${cur}` : ' • not marked'}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {ROSTER_BTNS.map(b => {
+                      const active = cur === b.key
+                      const busy = markingKey === `${emp._id}:${b.key}`
+                      return (
+                        <button
+                          key={b.key}
+                          disabled={!!markingKey}
+                          onClick={() => handleRosterMark(emp._id, b.key)}
+                          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold border transition-all active:scale-95 disabled:opacity-60 ${active ? b.on : b.off}`}
+                        >
+                          {busy ? '…' : b.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        )}
       </div>
 
       <div className="flex gap-2 flex-wrap">
