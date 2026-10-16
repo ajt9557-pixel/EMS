@@ -5,6 +5,7 @@ import App from './App.jsx'
 import './index.css'
 import AuthProvider from './context/authcontext.jsx'
 import ThemeContextProvider from './context/ThemeContext.jsx'
+import { NotificationProvider } from './context/NotificationContext.jsx'
 
 const basename = window.location.hostname.includes('github.io') ? '/EMS' : '/'
 
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter basename={basename}>
     <AuthProvider>
       <ThemeContextProvider>
-      <App />
+        <NotificationProvider>
+          <App />
+        </NotificationProvider>
       </ThemeContextProvider>
     </AuthProvider>
   </BrowserRouter>

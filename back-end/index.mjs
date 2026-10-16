@@ -11,6 +11,9 @@ import { uploadDir } from './controllers/employeeController.js';
 import salaryRouter from './routes/Salary.js';
 import LeaveRouter from './routes/Leave.js';
 import settingsRouter from './routes/Settings.js';
+import notificationRouter from './routes/notification.js';
+import attendanceRouter from './routes/Attendance.js';
+import meetingRouter from './routes/Meeting.js';
 if (!process.env.MONGODB_URL) console.warn('WARNING: MONGODB_URL not set');
 if (!process.env.JWT_KEY) console.warn('WARNING: JWT_KEY not set - auth will fail');
 connectDB().catch((err) => console.log('DB CONNECT ERROR:', err.message));
@@ -51,8 +54,8 @@ const corsOptions = {
         if (/^http:\/\/localhost:\d+$/.test(cleanOrigin) || /^http:\/\/127\.0\.0\.1:\d+$/.test(cleanOrigin)) {
             return callback(null, true);
         }
-        // fallback: allow if allowedOrigins empty? deny
-        return callback(null, true); // allow all but log - to avoid breaking salary in production; change to false to strictly enforce
+        console.log('CORS blocked origin:', cleanOrigin);
+        return callback(new Error(`CORS blocked: ${cleanOrigin}`));
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -68,6 +71,9 @@ app.use('/api/employee', employeeRouter);
 app.use('/api/salary', salaryRouter);
 app.use('/api/leave', LeaveRouter);
 app.use('/api/settings', settingsRouter);
+app.use('/api/notifications', notificationRouter);
+app.use('/api/attendance', attendanceRouter);
+app.use('/api/meetings', meetingRouter);
 
 // Global error handler - ensures JSON with `error` field, never `undefined` alert
 app.use((err, req, res, _next) => {

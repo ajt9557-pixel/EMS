@@ -3,6 +3,7 @@ import User from "../models/User.mjs";
 import Department from "../models/Department.js";
 import Salary from "../models/Salary.js";
 import Leave from "../models/Leave.js";
+import Attendance from "../models/Attendance.js";
 import bcrypt from "bcryptjs";
 import multer from "multer";
 import path from "path";
@@ -369,6 +370,7 @@ const deleteEmployee = async (req, res) => {
         if (employee.userId) await User.findByIdAndDelete(employee.userId);
         await Salary.deleteMany({ employeeId: employee._id });
         await Leave.deleteMany({ employeeId: employee._id });
+        await Attendance.deleteMany({ employeeId: employee._id });
         if (pic) {
             const picPath = path.join(uploadDir, pic);
             try { if (fs.existsSync(picPath)) fs.unlinkSync(picPath); } catch {}

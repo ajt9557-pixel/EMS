@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { API_URL } from '../../utils/api'
 import Datatable from 'react-data-table-component'
@@ -51,6 +51,7 @@ const salaryColumns = [
 
 const SalaryView = () => {
     const { id } = useParams()
+    const navigate = useNavigate()
     const { theme } = useTheme()
     const isDark = theme === 'dark'
     const [salaries, setSalaries] = useState([])
@@ -101,7 +102,7 @@ const SalaryView = () => {
         <div className="space-y-6">
             <button
                 type="button"
-                onClick={() => window.history.back()}
+                onClick={() => navigate(-1)}
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-colors mb-4"
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

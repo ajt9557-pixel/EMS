@@ -38,6 +38,25 @@ const SettingsIcon = () => (
   </svg>
 );
 
+const BellIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+  </svg>
+);
+
+const AttendanceIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+
+const CalendarIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
+    <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM6 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM6 10.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z" />
+  </svg>
+);
+
 const AdminSidebar = ({ onClose }) => {
   const linkClasses = ({ isActive }) =>
     `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors min-h-[44px] ${
@@ -86,6 +105,22 @@ const AdminSidebar = ({ onClose }) => {
         <NavLink to="/admin-dashboard/salary-dashboard" end className={linkClasses} onClick={handleNavClick}>
           <SalaryIcon />
           Salary
+        </NavLink>
+        <NavLink to="/admin-dashboard/attendance" end className={linkClasses} onClick={handleNavClick}>
+          <AttendanceIcon />
+          Attendance
+        </NavLink>
+        <NavLink to="/admin-dashboard/attendance-sheet" end className={linkClasses} onClick={handleNavClick}>
+          <AttendanceIcon />
+          Attendance Sheet
+        </NavLink>
+        <NavLink to="/admin-dashboard/calendar" end className={linkClasses} onClick={handleNavClick}>
+          <CalendarIcon />
+          Calendar
+        </NavLink>
+        <NavLink to="/admin-dashboard/notifications" end className={linkClasses} onClick={handleNavClick}>
+          <BellIcon />
+          Notifications
         </NavLink>
         <NavLink to="/admin-dashboard/Settings" end className={linkClasses} onClick={handleNavClick}>
           <SettingsIcon />

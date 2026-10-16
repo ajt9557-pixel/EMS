@@ -1,5 +1,7 @@
 import Leave from '../models/Leave.js';
 import Employee from '../models/Employee.js';
+import User from '../models/User.mjs';
+import { createNotificationForUser } from './notificationController.js';
 
 const addLeave = async (req, res) => {
     try {
@@ -53,6 +55,24 @@ const addLeave = async (req, res) => {
         });
 
         await newLeave.save();
+
+        // notify all admins about new leave request (fire-and-forget)
+        try {
+            const admins = await User.find({ role: 'admin' }).select('_id');
+            const requesterName = req.user?.name || 'An employee';
+            await Promise.all(
+                admins.map(a =>
+                    createNotificationForUser({
+                        userId: a._id,
+                        title: 'New leave request',
+                        message: `${requesterName} requested ${leaveType} leave from ${start.toDateString()} to ${end.toDateString()}`,
+                        variant: 'info',
+                        link: `/admin-dashboard/Leaves`,
+                        relatedId: newLeave._id,
+                    })
+                )
+            );
+        } catch (e) { console.log('notify admins failed:', e.message); }
 
         return res.status(201).json({
             success: true,
@@ -178,6 +198,24 @@ const updateLeave = async (req, res) => {
         }
         leave.updatedAt = Date.now();
         await leave.save();
+
+        // notify employee about status change
+        try {
+            const emp = await Employee.findById(leave.employeeId).populate('userId', 'name');
+            const ownerId = emp?.userId?._id || emp?.userId;
+            if (ownerId) {
+                const isApproved = req.body.status === 'approved';
+                await createNotificationForUser({
+                    userId: ownerId,
+                    title: isApproved ? 'Leave approved' : 'Leave rejected',
+                    message: `Your ${leave.leaveType} leave (${new Date(leave.startDate).toDateString()} - ${new Date(leave.endDate).toDateString()}) was ${req.body.status}`,
+                    variant: isApproved ? 'success' : 'error',
+                    link: `/employee-dashboard/Leaves`,
+                    relatedId: leave._id,
+                });
+            }
+        } catch (e) { console.log('notify employee failed:', e.message); }
+
         return res.status(200).json({ success: true, leave });
     }
     catch (error) {

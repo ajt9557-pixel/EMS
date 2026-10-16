@@ -1,6 +1,7 @@
 import React from 'react'
 import { useAuth } from "../../context/authcontext";
 import {useTheme} from '../../context/ThemeContext'
+import NotificationBell from './NotificationBell'
 
 const Navbar = () => {
   const { user, logout } = useAuth()
@@ -22,6 +23,7 @@ const Navbar = () => {
       </h3>
 
       <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <NotificationBell />
           <button 
             onClick={toggleTheme}
             className="p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"

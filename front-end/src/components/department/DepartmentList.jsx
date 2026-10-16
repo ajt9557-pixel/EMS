@@ -37,19 +37,19 @@ function DepartmentList() {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("ANO DEDELETEMOOO??")) return;
+    if (!window.confirm("Delete this department? This cannot be undone.")) return;
     try {
       const response = await axios.delete(`${API_URL}/api/department/${id}`, authHeader);
       if (response.data.success) {
         setDepartments((prev) => prev.filter((dept) => dept._id !== id));
       }
     } catch (err) {
-      alert(err.response?.data?.error || "failed ka boi");
+      setError(err.response?.data?.error || "Failed to delete department");
     }
   };
 
   const filtered = departments.filter((dept) =>
-    dept.dep_name.toLowerCase().includes(search.toLowerCase())
+    (dept.dep_name || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const rows = filtered.map((dept, index) => ({

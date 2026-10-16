@@ -14,6 +14,7 @@ import View from "./components/employee/view.jsx";
 import Edit from "./components/employee/edit.jsx";
 import SalaryList from "./components/salar/SalaryList.jsx";
 import AddSalary from "./components/salar/Add.jsx";
+import SalaryView from "./components/salar/view.jsx";
 import Summary from './components/EmployeeDashboard/Summary.jsx';
 import LeaveList from './components/Leaves/Leavelist.jsx';
 import MyProfile from './components/EmployeeDashboard/MyProfile.jsx';
@@ -22,10 +23,18 @@ import Settings from './components/EmployeeDashboard/Settings.jsx';
 import Table from './components/Leaves/Table.jsx';
 import LeaveDetails from './components/Leaves/LeaveDetails.jsx';
 import EmployeeLeaveHistory from './components/Leaves/EmployeeLeaveHistory.jsx';
+import Noti from './notification/noti.jsx';
+import NotificationToast from './components/dashboard/NotificationToast.jsx';
+import AttendanceEmployee from './components/attendance/AttendanceEmployee.jsx';
+import AttendanceAdmin from './components/attendance/AttendanceAdmin.jsx';
+import AttendanceSheet from './components/attendance/AttendanceSheet.jsx';
+import BusinessCalendar from './components/calendar/BusinessCalendar.jsx';
   
 function App() {
   return (
-    <Routes>
+    <>
+      <NotificationToast />
+      <Routes>
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<div className="p-8 text-center text-red-600">You are not authorized to view this page.</div>} />
@@ -46,7 +55,7 @@ function App() {
           <Route path="salary/:id" element={<SalaryList />} />
           <Route path="add-salary" element={<AddSalary />} />
           <Route path="add-salary/:id" element={<AddSalary />} />
-          <Route path="view/:id" element={<AddSalary />} />
+          <Route path="view/:id" element={<SalaryView />} />
           <Route path="addSalary/:id" element={<AddSalary />} />
           <Route path="add-employee" element={<Add/>} />
           <Route path="employee/:id/view" element={<View />} />
@@ -56,6 +65,10 @@ function App() {
           <Route path="employee/:id/leaves" element={<EmployeeLeaveHistory />} />
           <Route path="Profile" element={<MyProfile />} />
           <Route path="Settings" element={<Settings />} />
+          <Route path="notifications" element={<Noti />} />
+          <Route path="attendance" element={<AttendanceAdmin />} />
+          <Route path="attendance-sheet" element={<AttendanceSheet />} />
+          <Route path="calendar" element={<BusinessCalendar />} />
         </Route>
 
       <Route path="/employee-dashboard" element={
@@ -71,8 +84,14 @@ function App() {
           <Route path="salary" element={<SalaryList selfService />} />
           <Route path="add-leave" element={<AddLeave />} />
           <Route path="Settings" element={<Settings />} />
+          <Route path="notifications" element={<Noti />} />
+          <Route path="attendance" element={<AttendanceEmployee />} />
+          <Route path="attendance-sheet" element={<AttendanceSheet selfOnly />} />
+          <Route path="calendar" element={<BusinessCalendar />} />
         </Route>
+      <Route path="*" element={<div className="p-8 text-center text-gray-500">Page not found. <a className="text-blue-600 underline" href="/login">Go to login</a></div>} />
     </Routes>
+    </>
   )
 }
 

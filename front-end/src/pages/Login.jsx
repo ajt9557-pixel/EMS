@@ -20,18 +20,20 @@ const Login = () => {
     setError(null)
     setLoading(true)
     try {
-      const [response] = await Promise.all([
-        axios.post(`${API_URL}/api/auth/login`, {
-          email,
-          password,
-        }),
-        new Promise((resolve) => setTimeout(resolve, 1500)),
-      ])
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
+        email,
+        password,
+      })
 
       if (response.data.success) {
         login(response.data.user)
 
-        localStorage.setItem('token', response.data.tokken)
+        const authToken = response.data.token ?? response.data.tokken
+        if (!authToken) {
+          setError('Login succeeded but no token was returned. Try again.')
+          return
+        }
+        localStorage.setItem('token', authToken)
         if (response.data.user.role === 'admin') {
           navigate('/admin-dashboard')
         } else {
@@ -208,7 +210,7 @@ const Login = () => {
                <div className="w-full border-t border-blue-100 dark:border-gray-700" />
             </div>
             <div className="relative flex justify-center text-xs">
-               <span className="bg-white/80 dark:bg-gray-800/80 px-3 text-blue-300 dark:text-white">POGI NA GAWA NI ALEXIS</span>
+               <span className="bg-white/80 dark:bg-gray-800/80 px-3 text-blue-300 dark:text-white">Secure sign-in • AICS EMS</span>
             </div>
           </div>
         </div>
